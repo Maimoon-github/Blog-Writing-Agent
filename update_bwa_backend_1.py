@@ -945,7 +945,7 @@ logger = logging.getLogger(__name__)
 # ======================================================================
 # Research output directory (WRE reports: JSON + MD + HTML)
 # ======================================================================
-RESEARCH_OUTPUT_DIR = Path("Analysis and Proposed Updates\research_outputs")
+RESEARCH_OUTPUT_DIR = Path("research_outputs")
 
 # ======================================================================
 # Qwen3 Reasoning Trace Extraction
