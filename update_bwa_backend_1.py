@@ -1075,9 +1075,12 @@ class State(TypedDict):
 # ======================================================================
 # 3. LLM – module-level so Streamlit frontend can hot-swap them
 # ======================================================================
+
 llm = ChatOllama(model="llama3.2:3b", temperature=0.7, timeout=60)
 llm_async = ChatOllama(model="llama3.2:3b", temperature=0.7, timeout=60)
 
+# llm = ChatOllama(model="tinyllama", temperature=0.7, timeout=60)
+# llm_async = ChatOllama(model="tinyllama", temperature=0.7, timeout=60)
 
 # ======================================================================
 # 4. Router Node  (§2.2: Agent->>Ollama: router decision prompt)
@@ -1096,6 +1099,58 @@ For open_book weekly roundup include queries reflecting the last 7 days.
 
 Return a RouterDecision object.
 """
+
+
+# def router_node(state: State) -> dict:
+#     logger.info(">>> router_node")
+#     from datetime import datetime as _dt
+#     as_of = state.get("as_of") or _dt.now().date().isoformat()
+
+#     decider = llm.with_structured_output(RouterDecision)
+#     try:
+#         decision: RouterDecision = decider.invoke([
+#             SystemMessage(content=ROUTER_SYSTEM),
+#             HumanMessage(content=f"Topic: {state['topic']}\nAs-of date: {as_of}"),
+#         ])
+#     except Exception as exc:
+#         logger.error(f"Router LLM failed: {exc} – defaulting to closed_book")
+#         decision = RouterDecision(
+#             needs_research=False,
+#             mode="closed_book",
+#             reason="LLM error; defaulting to closed-book",
+#             queries=[],
+#         )
+
+#     # Respect optional user override from the Streamlit sidebar
+#     user_mode = state.get("user_research_mode")
+#     # if user_mode is not None:
+#     #     decision.mode = user_mode
+#     #     decision.needs_research = user_mode in ("hybrid", "open_book")
+#     #     logger.info(f"User mode override applied: {user_mode}")
+
+#     # After applying user override
+#     if decision.needs_research and not decision.queries:
+#         # Generate fallback queries
+#         topic = state["topic"]
+#         fallback_queries = [topic, f"{topic} latest", f"{topic} news"]
+#         decision.queries = fallback_queries[:3]   # keep it reasonable
+#         logger.warning(
+#             f"Router returned no queries for research mode; using fallback: {decision.queries}"
+#         )
+
+#     recency_days = {"open_book": 7, "hybrid": 45}.get(decision.mode, 3650)
+
+#     logger.info(f"Router: mode={decision.mode}, needs_research={decision.needs_research}")
+#     logger.info("<<< router_node")
+#     return {
+#         "router_decision": decision.model_dump(),
+#         "needs_research": decision.needs_research,
+#         "mode": decision.mode,
+#         "queries": decision.queries,
+#         "recency_days": recency_days,
+#         "as_of": as_of,
+#     }
+
 
 
 def router_node(state: State) -> dict:
@@ -1125,6 +1180,15 @@ def router_node(state: State) -> dict:
         decision.needs_research = user_mode in ("hybrid", "open_book")
         logger.info(f"User mode override applied: {user_mode}")
 
+    # Ensure we have queries if research is needed
+    if decision.needs_research and not decision.queries:
+        topic = state["topic"]
+        fallback_queries = [topic, f"{topic} latest", f"{topic} news"]
+        decision.queries = fallback_queries[:3]
+        logger.warning(
+            f"Router returned no queries for research mode; using fallback: {decision.queries}"
+        )
+
     recency_days = {"open_book": 7, "hybrid": 45}.get(decision.mode, 3650)
 
     logger.info(f"Router: mode={decision.mode}, needs_research={decision.needs_research}")
@@ -1137,6 +1201,7 @@ def router_node(state: State) -> dict:
         "recency_days": recency_days,
         "as_of": as_of,
     }
+
 
 
 def route_next(state: State) -> str:

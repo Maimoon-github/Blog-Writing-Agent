@@ -1,0 +1,496 @@
+2026-02-17 14:03:54,965 - update_bwa_backend_1 - INFO - >>> router_node
+2026-02-17 14:04:08,870 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 14:04:08,902 - update_bwa_backend_1 - ERROR - Router LLM failed: llama runner process has terminated: signal: terminated (status code: 500) – defaulting to closed_book
+2026-02-17 14:04:08,903 - update_bwa_backend_1 - INFO - User mode override applied: closed_book
+2026-02-17 14:04:08,904 - update_bwa_backend_1 - INFO - Router: mode=closed_book, needs_research=False
+2026-02-17 14:04:08,904 - update_bwa_backend_1 - INFO - <<< router_node
+2026-02-17 14:04:08,929 - update_bwa_backend_1 - INFO - >>> orchestrator_node
+2026-02-17 14:04:21,794 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 14:04:21,796 - update_bwa_backend_1 - ERROR - Orchestrator LLM failed: llama runner process has terminated: signal: terminated (status code: 500) – using minimal fallback plan
+2026-02-17 14:04:21,796 - update_bwa_backend_1 - INFO - Orchestrator: 'Blog about Benefits of Python type hints' – 1 tasks
+2026-02-17 14:04:21,796 - update_bwa_backend_1 - INFO - <<< orchestrator_node
+2026-02-17 14:04:21,797 - update_bwa_backend_1 - INFO - Fanout: dispatching 1 parallel worker tasks
+2026-02-17 14:04:21,798 - update_bwa_backend_1 - INFO - >>> worker_node – task 1: 'Introduction'
+2026-02-17 14:04:34,707 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 14:04:34,773 - update_bwa_backend_1 - ERROR - Worker LLM failed for task 1: llama runner process has terminated: signal: terminated (status code: 500)
+2026-02-17 14:04:34,774 - update_bwa_backend_1 - INFO - <<< worker_node – task 1
+2026-02-17 14:04:34,794 - update_bwa_backend_1 - INFO - >>> merge_content
+2026-02-17 14:04:34,794 - update_bwa_backend_1 - INFO - <<< merge_content
+2026-02-17 14:04:34,795 - update_bwa_backend_1 - INFO - >>> decide_images
+2026-02-17 14:04:47,834 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 14:04:47,836 - update_bwa_backend_1 - ERROR - Image planning failed: llama runner process has terminated: signal: terminated (status code: 500) – skipping images
+2026-02-17 14:04:47,836 - update_bwa_backend_1 - INFO - decide_images: 0 image spec(s)
+2026-02-17 14:04:47,836 - update_bwa_backend_1 - INFO - <<< decide_images
+2026-02-17 14:04:47,838 - update_bwa_backend_1 - INFO - >>> generate_images
+2026-02-17 14:04:47,838 - update_bwa_backend_1 - INFO - No image specs – nothing to generate
+2026-02-17 14:04:47,839 - update_bwa_backend_1 - INFO - <<< generate_images
+2026-02-17 14:04:47,841 - update_bwa_backend_1 - INFO - >>> place_images
+2026-02-17 14:04:47,847 - update_bwa_backend_1 - INFO - Final blog saved as: blog_about_benefits_of_python_type_hints.md
+2026-02-17 14:04:47,847 - update_bwa_backend_1 - INFO - <<< place_images
+2026-02-17 14:05:19,623 - update_bwa_backend_1 - INFO - >>> router_node
+2026-02-17 14:05:32,963 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 14:05:32,987 - update_bwa_backend_1 - ERROR - Router LLM failed: llama runner process has terminated: signal: terminated (status code: 500) – defaulting to closed_book
+2026-02-17 14:05:32,988 - update_bwa_backend_1 - INFO - User mode override applied: closed_book
+2026-02-17 14:05:32,988 - update_bwa_backend_1 - INFO - Router: mode=closed_book, needs_research=False
+2026-02-17 14:05:32,988 - update_bwa_backend_1 - INFO - <<< router_node
+2026-02-17 14:05:33,011 - update_bwa_backend_1 - INFO - >>> orchestrator_node
+2026-02-17 14:05:45,958 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 14:05:45,959 - update_bwa_backend_1 - ERROR - Orchestrator LLM failed: llama runner process has terminated: signal: terminated (status code: 500) – using minimal fallback plan
+2026-02-17 14:05:45,959 - update_bwa_backend_1 - INFO - Orchestrator: 'Blog about Benefits of Python type hints' – 1 tasks
+2026-02-17 14:05:45,959 - update_bwa_backend_1 - INFO - <<< orchestrator_node
+2026-02-17 14:05:45,960 - update_bwa_backend_1 - INFO - Fanout: dispatching 1 parallel worker tasks
+2026-02-17 14:05:45,962 - update_bwa_backend_1 - INFO - >>> worker_node – task 1: 'Introduction'
+2026-02-17 14:05:59,284 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 14:05:59,298 - update_bwa_backend_1 - ERROR - Worker LLM failed for task 1: llama runner process has terminated: signal: terminated (status code: 500)
+2026-02-17 14:05:59,299 - update_bwa_backend_1 - INFO - <<< worker_node – task 1
+2026-02-17 14:05:59,310 - update_bwa_backend_1 - INFO - >>> merge_content
+2026-02-17 14:05:59,310 - update_bwa_backend_1 - INFO - <<< merge_content
+2026-02-17 14:05:59,311 - update_bwa_backend_1 - INFO - >>> decide_images
+2026-02-17 14:06:14,051 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 14:06:14,075 - update_bwa_backend_1 - ERROR - Image planning failed: llama runner process has terminated: signal: terminated (status code: 500) – skipping images
+2026-02-17 14:06:14,076 - update_bwa_backend_1 - INFO - decide_images: 0 image spec(s)
+2026-02-17 14:06:14,076 - update_bwa_backend_1 - INFO - <<< decide_images
+2026-02-17 14:06:14,085 - update_bwa_backend_1 - INFO - >>> generate_images
+2026-02-17 14:06:14,086 - update_bwa_backend_1 - INFO - No image specs – nothing to generate
+2026-02-17 14:06:14,086 - update_bwa_backend_1 - INFO - <<< generate_images
+2026-02-17 14:06:14,086 - update_bwa_backend_1 - INFO - >>> place_images
+2026-02-17 14:06:14,087 - update_bwa_backend_1 - INFO - Final blog saved as: blog_about_benefits_of_python_type_hints.md
+2026-02-17 14:06:14,087 - update_bwa_backend_1 - INFO - <<< place_images
+2026-02-17 14:22:47,100 - update_bwa_backend_1 - INFO - >>> router_node
+2026-02-17 14:23:04,338 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-02-17 14:23:39,882 - update_bwa_backend_1 - INFO - User mode override applied: closed_book
+2026-02-17 14:23:39,882 - update_bwa_backend_1 - INFO - Router: mode=closed_book, needs_research=False
+2026-02-17 14:23:39,883 - update_bwa_backend_1 - INFO - <<< router_node
+2026-02-17 14:23:39,885 - update_bwa_backend_1 - INFO - >>> orchestrator_node
+2026-02-17 14:24:02,919 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-02-17 14:28:20,328 - update_bwa_backend_1 - INFO - Orchestrator: 'Unlocking the Power of Python Type Hints' – 9 tasks
+2026-02-17 14:28:20,328 - update_bwa_backend_1 - INFO - <<< orchestrator_node
+2026-02-17 14:28:20,329 - update_bwa_backend_1 - INFO - Fanout: dispatching 9 parallel worker tasks
+2026-02-17 14:28:20,330 - update_bwa_backend_1 - INFO - >>> worker_node – task 1: 'What are Python type hints?'
+2026-02-17 14:28:20,331 - update_bwa_backend_1 - INFO - >>> worker_node – task 2: 'Benefits of using Python type hints'
+2026-02-17 14:28:20,332 - update_bwa_backend_1 - INFO - >>> worker_node – task 3: 'Type hinting for function parameters'
+2026-02-17 14:28:20,332 - update_bwa_backend_1 - INFO - >>> worker_node – task 4: 'Type hinting for variable assignments'
+2026-02-17 14:28:20,332 - update_bwa_backend_1 - INFO - >>> worker_node – task 5: 'Using type hints with generic types'
+2026-02-17 14:28:20,333 - update_bwa_backend_1 - INFO - >>> worker_node – task 6: 'Benefits of using type hints with third-party libraries'
+2026-02-17 14:28:20,334 - update_bwa_backend_1 - INFO - >>> worker_node – task 7: 'Common pitfalls to avoid when using type hints'
+2026-02-17 14:28:20,335 - update_bwa_backend_1 - INFO - >>> worker_node – task 8: 'Best practices for using type hints'
+2026-02-17 14:28:20,335 - update_bwa_backend_1 - INFO - >>> worker_node – task 9: 'Conclusion'
+2026-02-17 14:29:18,516 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-02-17 14:29:57,631 - update_bwa_backend_1 - INFO - <<< worker_node – task 4
+2026-02-17 14:30:15,442 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-02-17 14:30:54,114 - update_bwa_backend_1 - INFO - <<< worker_node – task 2
+2026-02-17 14:31:10,694 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-02-17 14:31:46,553 - update_bwa_backend_1 - INFO - <<< worker_node – task 1
+2026-02-17 14:32:01,876 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-02-17 14:32:58,615 - update_bwa_backend_1 - INFO - <<< worker_node – task 3
+2026-02-17 14:33:15,352 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-02-17 14:33:42,096 - update_bwa_backend_1 - INFO - <<< worker_node – task 6
+2026-02-17 14:33:56,717 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-02-17 14:34:11,167 - update_bwa_backend_1 - INFO - <<< worker_node – task 9
+2026-02-17 14:34:27,025 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-02-17 14:34:51,234 - update_bwa_backend_1 - INFO - <<< worker_node – task 5
+2026-02-17 14:35:06,668 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-02-17 14:35:45,525 - update_bwa_backend_1 - INFO - <<< worker_node – task 8
+2026-02-17 14:36:02,198 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-02-17 14:36:45,370 - update_bwa_backend_1 - INFO - <<< worker_node – task 7
+2026-02-17 14:36:45,390 - update_bwa_backend_1 - INFO - >>> merge_content
+2026-02-17 14:36:45,390 - update_bwa_backend_1 - INFO - <<< merge_content
+2026-02-17 14:36:45,391 - update_bwa_backend_1 - INFO - >>> decide_images
+2026-02-17 14:41:23,030 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-02-17 14:45:41,255 - update_bwa_backend_1 - ERROR - Image planning failed: an error was encountered while running the model: unexpected EOF (status code: -1) – skipping images
+2026-02-17 14:45:41,256 - update_bwa_backend_1 - INFO - decide_images: 0 image spec(s)
+2026-02-17 14:45:41,256 - update_bwa_backend_1 - INFO - <<< decide_images
+2026-02-17 14:45:41,257 - update_bwa_backend_1 - INFO - >>> generate_images
+2026-02-17 14:45:41,257 - update_bwa_backend_1 - INFO - No image specs – nothing to generate
+2026-02-17 14:45:41,257 - update_bwa_backend_1 - INFO - <<< generate_images
+2026-02-17 14:45:41,258 - update_bwa_backend_1 - INFO - >>> place_images
+2026-02-17 14:45:41,260 - update_bwa_backend_1 - INFO - Final blog saved as: unlocking_the_power_of_python_type_hints.md
+2026-02-17 14:45:41,260 - update_bwa_backend_1 - INFO - <<< place_images
+2026-02-17 14:52:14,344 - update_bwa_backend_1 - INFO - >>> router_node
+2026-02-17 14:52:48,131 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-02-17 14:52:51,109 - update_bwa_backend_1 - ERROR - Router LLM failed: an error was encountered while running the model: unexpected EOF (status code: -1) – defaulting to closed_book
+2026-02-17 14:52:51,113 - update_bwa_backend_1 - INFO - User mode override applied: open_book
+2026-02-17 14:52:51,114 - update_bwa_backend_1 - INFO - Router: mode=open_book, needs_research=True
+2026-02-17 14:52:51,114 - update_bwa_backend_1 - INFO - <<< router_node
+2026-02-17 14:52:51,141 - update_bwa_backend_1 - INFO - >>> research_node
+2026-02-17 14:52:51,141 - update_bwa_backend_1 - INFO - No queries – skipping research
+2026-02-17 14:52:51,141 - update_bwa_backend_1 - INFO - >>> orchestrator_node
+2026-02-17 14:53:31,086 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-02-17 14:53:32,972 - update_bwa_backend_1 - ERROR - Orchestrator LLM failed: an error was encountered while running the model: unexpected EOF (status code: -1) – using minimal fallback plan
+2026-02-17 14:53:32,973 - update_bwa_backend_1 - INFO - Orchestrator: 'Blog about what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview' – 1 tasks
+2026-02-17 14:53:32,974 - update_bwa_backend_1 - INFO - <<< orchestrator_node
+2026-02-17 15:01:17,059 - update_bwa_backend_1 - INFO - >>> router_node
+2026-02-17 15:01:30,971 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 15:01:31,010 - update_bwa_backend_1 - ERROR - Router LLM failed: model runner has unexpectedly stopped, this may be due to resource limitations or an internal error, check ollama server logs for details (status code: 500) – defaulting to closed_book
+2026-02-17 15:01:31,010 - update_bwa_backend_1 - INFO - User mode override applied: open_book
+2026-02-17 15:01:31,011 - update_bwa_backend_1 - WARNING - Router returned no queries for research mode; using fallback: ["what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview", "what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview latest", "what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview news"]
+2026-02-17 15:01:31,011 - update_bwa_backend_1 - INFO - Router: mode=open_book, needs_research=True
+2026-02-17 15:01:31,011 - update_bwa_backend_1 - INFO - <<< router_node
+2026-02-17 15:01:31,036 - update_bwa_backend_1 - INFO - >>> research_node
+2026-02-17 15:01:31,285 - update_bwa_backend_1 - INFO - Phase A – DuckDuckGo search: 3 quer(ies) (timeout=90s)
+2026-02-17 15:01:31,298 - web_research_engine - INFO - ================================================================================
+2026-02-17 15:01:31,299 - web_research_engine - INFO - Starting research on: what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview
+2026-02-17 15:01:31,299 - web_research_engine - INFO - ================================================================================
+2026-02-17 15:01:31,299 - web_research_engine - INFO - Using 3 queries
+2026-02-17 15:01:31,300 - web_research_engine - INFO - 
+--- Query 1/3: what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview ---
+2026-02-17 15:01:31,300 - web_research_engine - INFO - Searching: 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview' (max_results=3)
+2026-02-17 15:01:31,321 - primp.impersonate - WARNING - Impersonate 'firefox_128' does not exist, using 'random'
+2026-02-17 15:01:31,613 - primp - INFO - response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=what%20is%20the%20current%20global%20situation%20concerning%20AI%20in%20today%27s%20world%3F%20AI%20global%20situation%20AI%20regulation%20AI_overview 200
+2026-02-17 15:01:31,636 - primp - INFO - response: https://grokipedia.com/api/typeahead?query=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview&limit=1 200
+2026-02-17 15:01:32,551 - httpx - INFO - HTTP Request: POST https://html.duckduckgo.com/html/ "HTTP/2 200 OK"
+2026-02-17 15:01:32,597 - web_research_engine - INFO - Found 3 results for 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview'
+2026-02-17 15:01:32,597 - web_research_engine - INFO - Extracting content [1/3]: https://www.weforum.org/stories/2024/04/stanford-university-ai-index-report/
+2026-02-17 15:01:32,597 - web_research_engine - INFO - Fetching: https://www.weforum.org/stories/2024/04/stanford-university-ai-index-report/
+2026-02-17 15:01:32,743 - web_research_engine - WARNING - Failed to fetch https://www.weforum.org/stories/2024/04/stanford-university-ai-index-report/: HTTP 403
+2026-02-17 15:01:32,745 - web_research_engine - INFO - Extracting content [2/3]: https://www.forbes.com/sites/jasonsnyder/2025/01/19/beyond-the-illusionthe-real-threat-of-ai-wef-global-risks-report-2025/
+2026-02-17 15:01:33,597 - web_research_engine - INFO - Fetching: https://www.forbes.com/sites/jasonsnyder/2025/01/19/beyond-the-illusionthe-real-threat-of-ai-wef-global-risks-report-2025/
+2026-02-17 15:01:33,651 - web_research_engine - WARNING - Failed to fetch https://www.forbes.com/sites/jasonsnyder/2025/01/19/beyond-the-illusionthe-real-threat-of-ai-wef-global-risks-report-2025/: HTTP 403
+2026-02-17 15:01:33,651 - web_research_engine - INFO - 
+--- Query 2/3: what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview latest ---
+2026-02-17 15:01:33,651 - web_research_engine - INFO - Searching: 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview latest' (max_results=3)
+2026-02-17 15:01:33,746 - primp - INFO - response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=what%20is%20the%20current%20global%20situation%20concerning%20AI%20in%20today%27s%20world%3F%20AI%20global%20situation%20AI%20regulation%20AI_overview%20latest 200
+2026-02-17 15:01:33,784 - primp - INFO - response: https://grokipedia.com/api/typeahead?query=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview+latest&limit=1 200
+2026-02-17 15:01:34,670 - httpx - INFO - HTTP Request: POST https://html.duckduckgo.com/html/ "HTTP/2 200 OK"
+2026-02-17 15:01:34,673 - web_research_engine - INFO - Found 3 results for 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview latest'
+2026-02-17 15:01:34,673 - web_research_engine - INFO - 
+--- Query 3/3: what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview news ---
+2026-02-17 15:01:34,673 - web_research_engine - INFO - Searching: 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview news' (max_results=3)
+2026-02-17 15:01:34,753 - primp - INFO - response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=what%20is%20the%20current%20global%20situation%20concerning%20AI%20in%20today%27s%20world%3F%20AI%20global%20situation%20AI%20regulation%20AI_overview%20news 200
+2026-02-17 15:01:34,852 - primp - INFO - response: https://grokipedia.com/api/typeahead?query=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview+news&limit=1 200
+2026-02-17 15:01:34,920 - primp - INFO - response: https://www.google.com/search?q=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview+news&filter=1&start=0&hl=en-US&lr=lang_en&cr=countryUS 200
+2026-02-17 15:01:35,299 - web_research_engine - INFO - Found 3 results for 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview news'
+2026-02-17 15:01:35,299 - web_research_engine - INFO - Extracting content [1/3]: https://www.un.org/en/global-issues/artificial-intelligence
+2026-02-17 15:01:35,299 - web_research_engine - INFO - Fetching: https://www.un.org/en/global-issues/artificial-intelligence
+2026-02-17 15:01:35,674 - readability.readability - INFO - ruthless removal did not work. 
+2026-02-17 15:01:35,704 - web_research_engine - INFO -   ✓ Extracted 2315 words using readability
+2026-02-17 15:01:35,704 - web_research_engine - INFO - Extracting content [2/3]: https://www.wsj.com/tech/ai?gaa_at=eafs
+2026-02-17 15:01:36,299 - web_research_engine - INFO - Fetching: https://www.wsj.com/tech/ai?gaa_at=eafs
+2026-02-17 15:01:36,456 - web_research_engine - WARNING - Failed to fetch https://www.wsj.com/tech/ai?gaa_at=eafs: HTTP 401
+2026-02-17 15:01:36,456 - web_research_engine - INFO - 
+================================================================================
+2026-02-17 15:01:36,457 - web_research_engine - INFO - Research Complete!
+2026-02-17 15:01:36,457 - web_research_engine - INFO - ================================================================================
+2026-02-17 15:01:36,457 - web_research_engine - INFO - Queries: 3
+2026-02-17 15:01:36,457 - web_research_engine - INFO - Search Results: 9
+2026-02-17 15:01:36,457 - web_research_engine - INFO - Pages Fetched: 4
+2026-02-17 15:01:36,457 - web_research_engine - INFO - Successful Extractions: 1
+2026-02-17 15:01:36,457 - web_research_engine - INFO - Total Words: 2,315
+2026-02-17 15:01:36,458 - web_research_engine - INFO - Time Elapsed: 5.16s
+2026-02-17 15:01:36,458 - web_research_engine - INFO - ================================================================================
+
+2026-02-17 15:01:36,458 - update_bwa_backend_1 - INFO - Phase A complete: 1 raw results
+2026-02-17 15:01:36,460 - web_research_engine - INFO - JSON report saved: research_outputs/what_is_the_current_global_situation_con_20260217_150136.json
+2026-02-17 15:01:36,460 - web_research_engine - INFO - Markdown report saved: research_outputs/what_is_the_current_global_situation_con_20260217_150136.md
+2026-02-17 15:01:36,460 - web_research_engine - INFO - HTML report saved: research_outputs/what_is_the_current_global_situation_con_20260217_150136.html
+2026-02-17 15:01:36,461 - update_bwa_backend_1 - INFO - Research outputs saved → research_outputs/what_is_the_current_global_situation_con_20260217_150136.{json,md,html}
+2026-02-17 15:01:36,461 - update_bwa_backend_1 - INFO - Phase B – Ollama synthesis of 1 raw results
+2026-02-17 15:01:49,284 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 15:01:49,285 - update_bwa_backend_1 - ERROR - Ollama synthesis failed: llama runner process has terminated: signal: terminated (status code: 500) – falling back to raw results
+2026-02-17 15:01:49,285 - update_bwa_backend_1 - INFO - Phase B complete: 1 evidence items synthesised
+2026-02-17 15:01:49,285 - update_bwa_backend_1 - INFO - <<< research_node
+2026-02-17 15:01:49,294 - update_bwa_backend_1 - INFO - >>> orchestrator_node
+2026-02-17 15:02:02,401 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 15:02:02,402 - update_bwa_backend_1 - ERROR - Orchestrator LLM failed: llama runner process has terminated: signal: terminated (status code: 500) – using minimal fallback plan
+2026-02-17 15:02:02,405 - update_bwa_backend_1 - INFO - Orchestrator: 'Blog about what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview' – 1 tasks
+2026-02-17 15:02:02,405 - update_bwa_backend_1 - INFO - <<< orchestrator_node
+2026-02-17 15:02:02,419 - update_bwa_backend_1 - INFO - Fanout: dispatching 1 parallel worker tasks
+2026-02-17 15:02:02,421 - update_bwa_backend_1 - INFO - >>> worker_node – task 1: 'Introduction'
+2026-02-17 15:02:15,422 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 15:02:15,459 - update_bwa_backend_1 - ERROR - Worker LLM failed for task 1: llama runner process has terminated: signal: terminated (status code: 500)
+2026-02-17 15:02:15,459 - update_bwa_backend_1 - INFO - <<< worker_node – task 1
+2026-02-17 15:02:15,476 - update_bwa_backend_1 - INFO - >>> merge_content
+2026-02-17 15:02:15,477 - update_bwa_backend_1 - INFO - <<< merge_content
+2026-02-17 15:02:15,477 - update_bwa_backend_1 - INFO - >>> decide_images
+2026-02-17 15:02:28,238 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 15:02:28,241 - update_bwa_backend_1 - ERROR - Image planning failed: llama runner process has terminated: signal: terminated (status code: 500) – skipping images
+2026-02-17 15:02:28,242 - update_bwa_backend_1 - INFO - decide_images: 0 image spec(s)
+2026-02-17 15:02:28,242 - update_bwa_backend_1 - INFO - <<< decide_images
+2026-02-17 15:02:28,243 - update_bwa_backend_1 - INFO - >>> generate_images
+2026-02-17 15:02:28,243 - update_bwa_backend_1 - INFO - No image specs – nothing to generate
+2026-02-17 15:02:28,243 - update_bwa_backend_1 - INFO - <<< generate_images
+2026-02-17 15:02:28,244 - update_bwa_backend_1 - INFO - >>> place_images
+2026-02-17 15:02:28,249 - update_bwa_backend_1 - INFO - Final blog saved as: blog_about_what_is_the_current_global_situation_concerning_ai_in_todays_world_ai_global_situation_ai_regulation_ai_overview.md
+2026-02-17 15:02:28,249 - update_bwa_backend_1 - INFO - <<< place_images
+2026-02-17 15:16:18,697 - update_bwa_backend_1 - INFO - >>> router_node
+2026-02-17 15:16:33,229 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 15:16:33,255 - update_bwa_backend_1 - ERROR - Router LLM failed: llama runner process has terminated: signal: terminated (status code: 500) – defaulting to closed_book
+2026-02-17 15:16:33,256 - update_bwa_backend_1 - INFO - User mode override applied: open_book
+2026-02-17 15:16:33,256 - update_bwa_backend_1 - WARNING - Router returned no queries for research mode; using fallback: ["what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview", "what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview latest", "what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview news"]
+2026-02-17 15:16:33,256 - update_bwa_backend_1 - INFO - Router: mode=open_book, needs_research=True
+2026-02-17 15:16:33,257 - update_bwa_backend_1 - INFO - <<< router_node
+2026-02-17 15:16:33,274 - update_bwa_backend_1 - INFO - >>> research_node
+2026-02-17 15:16:33,577 - update_bwa_backend_1 - INFO - Phase A – DuckDuckGo search: 3 quer(ies) (timeout=90s)
+2026-02-17 15:16:33,581 - web_research_engine - INFO - ================================================================================
+2026-02-17 15:16:33,581 - web_research_engine - INFO - Starting research on: what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview
+2026-02-17 15:16:33,581 - web_research_engine - INFO - ================================================================================
+2026-02-17 15:16:33,582 - web_research_engine - INFO - Using 3 queries
+2026-02-17 15:16:33,582 - web_research_engine - INFO - 
+--- Query 1/3: what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview ---
+2026-02-17 15:16:33,582 - web_research_engine - INFO - Searching: 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview' (max_results=3)
+2026-02-17 15:16:33,588 - primp.impersonate - WARNING - Impersonate 'chrome_100' does not exist, using 'random'
+2026-02-17 15:16:33,754 - primp - INFO - response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=what%20is%20the%20current%20global%20situation%20concerning%20AI%20in%20today%27s%20world%3F%20AI%20global%20situation%20AI%20regulation%20AI_overview 200
+2026-02-17 15:16:33,882 - primp - INFO - response: https://grokipedia.com/api/typeahead?query=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview&limit=1 200
+2026-02-17 15:16:34,209 - ddgs.ddgs - INFO - Error in engine mojeek: DDGSException("HTTPError: HTTPError('HTTP 403 Forbidden for URL: https://www.mojeek.com/search?q=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview', 403, 'https://www.mojeek.com/search?q=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview', 'Forbidden')")
+2026-02-17 15:16:35,220 - httpx - INFO - HTTP Request: POST https://html.duckduckgo.com/html/ "HTTP/2 200 OK"
+2026-02-17 15:16:35,249 - web_research_engine - INFO - Found 3 results for 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview'
+2026-02-17 15:16:35,250 - web_research_engine - INFO - Extracting content [1/3]: https://www.weforum.org/stories/2024/04/stanford-university-ai-index-report/
+2026-02-17 15:16:35,252 - web_research_engine - INFO - Fetching: https://www.weforum.org/stories/2024/04/stanford-university-ai-index-report/
+2026-02-17 15:16:35,366 - web_research_engine - WARNING - Failed to fetch https://www.weforum.org/stories/2024/04/stanford-university-ai-index-report/: HTTP 403
+2026-02-17 15:16:35,367 - web_research_engine - INFO - Extracting content [2/3]: https://www.forbes.com/sites/jasonsnyder/2025/01/19/beyond-the-illusionthe-real-threat-of-ai-wef-global-risks-report-2025/
+2026-02-17 15:16:36,252 - web_research_engine - INFO - Fetching: https://www.forbes.com/sites/jasonsnyder/2025/01/19/beyond-the-illusionthe-real-threat-of-ai-wef-global-risks-report-2025/
+2026-02-17 15:16:36,321 - web_research_engine - WARNING - Failed to fetch https://www.forbes.com/sites/jasonsnyder/2025/01/19/beyond-the-illusionthe-real-threat-of-ai-wef-global-risks-report-2025/: HTTP 403
+2026-02-17 15:16:36,321 - web_research_engine - INFO - 
+--- Query 2/3: what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview latest ---
+2026-02-17 15:16:36,321 - web_research_engine - INFO - Searching: 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview latest' (max_results=3)
+2026-02-17 15:16:36,324 - primp - INFO - response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=what%20is%20the%20current%20global%20situation%20concerning%20AI%20in%20today%27s%20world%3F%20AI%20global%20situation%20AI%20regulation%20AI_overview%20latest 200
+2026-02-17 15:16:36,500 - primp - INFO - response: https://grokipedia.com/api/typeahead?query=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview+latest&limit=1 200
+2026-02-17 15:16:36,562 - primp - INFO - response: https://www.google.com/search?q=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview+latest&filter=1&start=0&hl=en-US&lr=lang_en&cr=countryUS 200
+2026-02-17 15:16:37,164 - web_research_engine - INFO - Found 3 results for 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview latest'
+2026-02-17 15:16:37,168 - web_research_engine - INFO - Extracting content [1/3]: https://www.un.org/en/global-issues/artificial-intelligence
+2026-02-17 15:16:37,252 - web_research_engine - INFO - Fetching: https://www.un.org/en/global-issues/artificial-intelligence
+2026-02-17 15:16:37,702 - readability.readability - INFO - ruthless removal did not work. 
+2026-02-17 15:16:37,737 - web_research_engine - INFO -   ✓ Extracted 2315 words using readability
+2026-02-17 15:16:37,737 - web_research_engine - INFO - Extracting content [2/3]: https://hai.stanford.edu/ai-index/2025-ai-index-report
+2026-02-17 15:16:38,252 - web_research_engine - INFO - Fetching: https://hai.stanford.edu/ai-index/2025-ai-index-report
+2026-02-17 15:16:38,458 - web_research_engine - WARNING -   ✗ Content too short (89 words), skipping
+2026-02-17 15:16:38,458 - web_research_engine - INFO - 
+--- Query 3/3: what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview news ---
+2026-02-17 15:16:38,458 - web_research_engine - INFO - Searching: 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview news' (max_results=3)
+2026-02-17 15:16:38,461 - primp - INFO - response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=what%20is%20the%20current%20global%20situation%20concerning%20AI%20in%20today%27s%20world%3F%20AI%20global%20situation%20AI%20regulation%20AI_overview%20news 200
+2026-02-17 15:16:38,639 - primp - INFO - response: https://grokipedia.com/api/typeahead?query=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview+news&limit=1 200
+2026-02-17 15:16:39,469 - primp - INFO - response: https://search.brave.com/search?q=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview+news&source=web 200
+2026-02-17 15:16:39,486 - web_research_engine - INFO - Found 3 results for 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview news'
+2026-02-17 15:16:39,486 - web_research_engine - INFO - Extracting content [1/3]: https://iapp.org/news/a/global-ai-law-and-policy-tracker-highlights-and-takeaways
+2026-02-17 15:16:39,487 - web_research_engine - INFO - Fetching: https://iapp.org/news/a/global-ai-law-and-policy-tracker-highlights-and-takeaways
+2026-02-17 15:16:40,268 - web_research_engine - INFO -   ✓ Extracted 1543 words using readability
+2026-02-17 15:16:40,268 - web_research_engine - INFO - Extracting content [2/3]: https://www.mindfoundry.ai/blog/ai-regulations-around-the-world
+2026-02-17 15:16:40,487 - web_research_engine - INFO - Fetching: https://www.mindfoundry.ai/blog/ai-regulations-around-the-world
+2026-02-17 15:16:41,048 - web_research_engine - WARNING -   ✗ Content too short (27 words), skipping
+2026-02-17 15:16:41,048 - web_research_engine - INFO - 
+================================================================================
+2026-02-17 15:16:41,048 - web_research_engine - INFO - Research Complete!
+2026-02-17 15:16:41,048 - web_research_engine - INFO - ================================================================================
+2026-02-17 15:16:41,048 - web_research_engine - INFO - Queries: 3
+2026-02-17 15:16:41,048 - web_research_engine - INFO - Search Results: 9
+2026-02-17 15:16:41,048 - web_research_engine - INFO - Pages Fetched: 6
+2026-02-17 15:16:41,048 - web_research_engine - INFO - Successful Extractions: 2
+2026-02-17 15:16:41,048 - web_research_engine - INFO - Total Words: 3,974
+2026-02-17 15:16:41,048 - web_research_engine - INFO - Time Elapsed: 7.47s
+2026-02-17 15:16:41,049 - web_research_engine - INFO - ================================================================================
+
+2026-02-17 15:16:41,049 - update_bwa_backend_1 - INFO - Phase A complete: 2 raw results
+2026-02-17 15:16:41,052 - web_research_engine - INFO - JSON report saved: research_outputs/what_is_the_current_global_situation_con_20260217_151641.json
+2026-02-17 15:16:41,053 - web_research_engine - INFO - Markdown report saved: research_outputs/what_is_the_current_global_situation_con_20260217_151641.md
+2026-02-17 15:16:41,053 - web_research_engine - INFO - HTML report saved: research_outputs/what_is_the_current_global_situation_con_20260217_151641.html
+2026-02-17 15:16:41,053 - update_bwa_backend_1 - INFO - Research outputs saved → research_outputs/what_is_the_current_global_situation_con_20260217_151641.{json,md,html}
+2026-02-17 15:16:41,053 - update_bwa_backend_1 - INFO - Phase B – Ollama synthesis of 2 raw results
+2026-02-17 15:16:53,950 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 15:16:53,950 - update_bwa_backend_1 - ERROR - Ollama synthesis failed: llama runner process has terminated: signal: terminated (status code: 500) – falling back to raw results
+2026-02-17 15:16:53,951 - update_bwa_backend_1 - INFO - Phase B complete: 2 evidence items synthesised
+2026-02-17 15:16:53,951 - update_bwa_backend_1 - INFO - <<< research_node
+2026-02-17 15:16:53,964 - update_bwa_backend_1 - INFO - >>> orchestrator_node
+2026-02-17 15:17:07,293 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 15:17:07,296 - update_bwa_backend_1 - ERROR - Orchestrator LLM failed: llama runner process has terminated: signal: terminated (status code: 500) – using minimal fallback plan
+2026-02-17 15:17:07,300 - update_bwa_backend_1 - INFO - Orchestrator: 'Blog about what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview' – 1 tasks
+2026-02-17 15:17:07,302 - update_bwa_backend_1 - INFO - <<< orchestrator_node
+2026-02-17 15:17:07,324 - update_bwa_backend_1 - INFO - Fanout: dispatching 1 parallel worker tasks
+2026-02-17 15:17:07,329 - update_bwa_backend_1 - INFO - >>> worker_node – task 1: 'Introduction'
+2026-02-17 15:17:20,472 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 15:17:20,506 - update_bwa_backend_1 - ERROR - Worker LLM failed for task 1: llama runner process has terminated: signal: terminated (status code: 500)
+2026-02-17 15:17:20,507 - update_bwa_backend_1 - INFO - <<< worker_node – task 1
+2026-02-17 15:17:20,518 - update_bwa_backend_1 - INFO - >>> merge_content
+2026-02-17 15:17:20,518 - update_bwa_backend_1 - INFO - <<< merge_content
+2026-02-17 15:17:20,519 - update_bwa_backend_1 - INFO - >>> decide_images
+2026-02-17 15:17:34,533 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 15:17:34,539 - update_bwa_backend_1 - ERROR - Image planning failed: llama runner process has terminated: signal: terminated (status code: 500) – skipping images
+2026-02-17 15:17:34,540 - update_bwa_backend_1 - INFO - decide_images: 0 image spec(s)
+2026-02-17 15:17:34,540 - update_bwa_backend_1 - INFO - <<< decide_images
+2026-02-17 15:17:34,558 - update_bwa_backend_1 - INFO - >>> generate_images
+2026-02-17 15:17:34,558 - update_bwa_backend_1 - INFO - No image specs – nothing to generate
+2026-02-17 15:17:34,559 - update_bwa_backend_1 - INFO - <<< generate_images
+2026-02-17 15:17:34,559 - update_bwa_backend_1 - INFO - >>> place_images
+2026-02-17 15:17:34,560 - update_bwa_backend_1 - INFO - Final blog saved as: blog_about_what_is_the_current_global_situation_concerning_ai_in_todays_world_ai_global_situation_ai_regulation_ai_overview.md
+2026-02-17 15:17:34,560 - update_bwa_backend_1 - INFO - <<< place_images
+2026-02-17 15:23:32,045 - update_bwa_backend_1 - INFO - >>> router_node
+2026-02-17 15:23:45,745 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 15:23:45,776 - update_bwa_backend_1 - ERROR - Router LLM failed: llama runner process has terminated: signal: terminated (status code: 500) – defaulting to closed_book
+2026-02-17 15:23:45,777 - update_bwa_backend_1 - INFO - User mode override applied: open_book
+2026-02-17 15:23:45,777 - update_bwa_backend_1 - WARNING - Router returned no queries for research mode; using fallback: ["what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview", "what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview latest", "what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview news"]
+2026-02-17 15:23:45,777 - update_bwa_backend_1 - INFO - Router: mode=open_book, needs_research=True
+2026-02-17 15:23:45,777 - update_bwa_backend_1 - INFO - <<< router_node
+2026-02-17 15:23:45,795 - update_bwa_backend_1 - INFO - >>> research_node
+2026-02-17 15:23:46,110 - update_bwa_backend_1 - INFO - Phase A – DuckDuckGo search: 3 quer(ies) (timeout=90s)
+2026-02-17 15:23:46,115 - web_research_engine - INFO - ================================================================================
+2026-02-17 15:23:46,115 - web_research_engine - INFO - Starting research on: what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview
+2026-02-17 15:23:46,115 - web_research_engine - INFO - ================================================================================
+2026-02-17 15:23:46,115 - web_research_engine - INFO - Using 3 queries
+2026-02-17 15:23:46,115 - web_research_engine - INFO - 
+--- Query 1/3: what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview ---
+2026-02-17 15:23:46,115 - web_research_engine - INFO - Searching: 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview' (max_results=3)
+2026-02-17 15:23:46,124 - primp.impersonate - WARNING - Impersonate 'chrome_109' does not exist, using 'random'
+2026-02-17 15:23:46,361 - primp - INFO - response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=what%20is%20the%20current%20global%20situation%20concerning%20AI%20in%20today%27s%20world%3F%20AI%20global%20situation%20AI%20regulation%20AI_overview 200
+2026-02-17 15:23:46,485 - primp - INFO - response: https://grokipedia.com/api/typeahead?query=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview&limit=1 200
+2026-02-17 15:23:47,330 - primp - INFO - response: https://yandex.com/search/site/?text=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview&web=1&searchid=5034166 200
+2026-02-17 15:23:47,382 - web_research_engine - INFO - Found 3 results for 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview'
+2026-02-17 15:23:47,382 - web_research_engine - INFO - Extracting content [1/3]: https://en.wikipedia.org/wiki/Artificial_general_intelligence
+2026-02-17 15:23:47,382 - web_research_engine - INFO - Fetching: https://en.wikipedia.org/wiki/Artificial_general_intelligence
+2026-02-17 15:23:47,893 - web_research_engine - INFO -   ✓ Extracted 16459 words using readability
+2026-02-17 15:23:47,893 - web_research_engine - INFO - Extracting content [2/3]: https://hai.stanford.edu/ai-index/2025-ai-index-report
+2026-02-17 15:23:48,382 - web_research_engine - INFO - Fetching: https://hai.stanford.edu/ai-index/2025-ai-index-report
+2026-02-17 15:23:48,777 - web_research_engine - WARNING -   ✗ Content too short (89 words), skipping
+2026-02-17 15:23:48,777 - web_research_engine - INFO - 
+--- Query 2/3: what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview latest ---
+2026-02-17 15:23:48,777 - web_research_engine - INFO - Searching: 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview latest' (max_results=3)
+2026-02-17 15:23:48,779 - primp - INFO - response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=what%20is%20the%20current%20global%20situation%20concerning%20AI%20in%20today%27s%20world%3F%20AI%20global%20situation%20AI%20regulation%20AI_overview%20latest 200
+2026-02-17 15:23:48,790 - primp - INFO - response: https://grokipedia.com/api/typeahead?query=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview+latest&limit=1 200
+2026-02-17 15:23:48,947 - primp - INFO - response: https://search.yahoo.com/search;_ylt=dVkU88MFvnGtmItqic4Yv6xY;_ylu=DqsyCt0hEUdtM4j5aLqi-E1LmmJbXEKZm84dQio1B5fvf0Y?p=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview+latest 200
+2026-02-17 15:23:49,725 - web_research_engine - INFO - Found 3 results for 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview latest'
+2026-02-17 15:23:49,726 - web_research_engine - INFO - Extracting content [1/3]: https://www.forbes.com/sites/jasonsnyder/2025/01/19/beyond-the-illusionthe-real-threat-of-ai-wef-global-risks-report-2025/
+2026-02-17 15:23:49,726 - web_research_engine - INFO - Fetching: https://www.forbes.com/sites/jasonsnyder/2025/01/19/beyond-the-illusionthe-real-threat-of-ai-wef-global-risks-report-2025/
+2026-02-17 15:23:49,773 - web_research_engine - WARNING - Failed to fetch https://www.forbes.com/sites/jasonsnyder/2025/01/19/beyond-the-illusionthe-real-threat-of-ai-wef-global-risks-report-2025/: HTTP 403
+2026-02-17 15:23:49,773 - web_research_engine - INFO - Extracting content [2/3]: https://www.weforum.org/stories/2024/04/stanford-university-ai-index-report/
+2026-02-17 15:23:50,726 - web_research_engine - INFO - Fetching: https://www.weforum.org/stories/2024/04/stanford-university-ai-index-report/
+2026-02-17 15:23:50,923 - web_research_engine - WARNING - Failed to fetch https://www.weforum.org/stories/2024/04/stanford-university-ai-index-report/: HTTP 403
+2026-02-17 15:23:50,924 - web_research_engine - INFO - 
+--- Query 3/3: what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview news ---
+2026-02-17 15:23:50,924 - web_research_engine - INFO - Searching: 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview news' (max_results=3)
+2026-02-17 15:23:50,927 - primp - INFO - response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=what%20is%20the%20current%20global%20situation%20concerning%20AI%20in%20today%27s%20world%3F%20AI%20global%20situation%20AI%20regulation%20AI_overview%20news 200
+2026-02-17 15:23:50,937 - primp - INFO - response: https://grokipedia.com/api/typeahead?query=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview+news&limit=1 200
+2026-02-17 15:23:51,233 - primp - INFO - response: https://search.brave.com/search?q=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview+news&source=web 200
+2026-02-17 15:23:51,245 - web_research_engine - INFO - Found 3 results for 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview news'
+2026-02-17 15:23:51,245 - web_research_engine - INFO - Extracting content [1/3]: https://iapp.org/news/a/global-ai-law-and-policy-tracker-highlights-and-takeaways
+2026-02-17 15:23:51,726 - web_research_engine - INFO - Fetching: https://iapp.org/news/a/global-ai-law-and-policy-tracker-highlights-and-takeaways
+2026-02-17 15:23:52,456 - web_research_engine - INFO -   ✓ Extracted 1543 words using readability
+2026-02-17 15:23:52,457 - web_research_engine - INFO - Extracting content [2/3]: https://www.mindfoundry.ai/blog/ai-regulations-around-the-world
+2026-02-17 15:23:52,726 - web_research_engine - INFO - Fetching: https://www.mindfoundry.ai/blog/ai-regulations-around-the-world
+2026-02-17 15:23:53,286 - web_research_engine - WARNING -   ✗ Content too short (27 words), skipping
+2026-02-17 15:23:53,287 - web_research_engine - INFO - 
+================================================================================
+2026-02-17 15:23:53,287 - web_research_engine - INFO - Research Complete!
+2026-02-17 15:23:53,287 - web_research_engine - INFO - ================================================================================
+2026-02-17 15:23:53,287 - web_research_engine - INFO - Queries: 3
+2026-02-17 15:23:53,288 - web_research_engine - INFO - Search Results: 9
+2026-02-17 15:23:53,288 - web_research_engine - INFO - Pages Fetched: 6
+2026-02-17 15:23:53,288 - web_research_engine - INFO - Successful Extractions: 2
+2026-02-17 15:23:53,288 - web_research_engine - INFO - Total Words: 18,118
+2026-02-17 15:23:53,288 - web_research_engine - INFO - Time Elapsed: 7.17s
+2026-02-17 15:23:53,288 - web_research_engine - INFO - ================================================================================
+
+2026-02-17 15:23:53,289 - update_bwa_backend_1 - INFO - Phase A complete: 2 raw results
+2026-02-17 15:23:53,292 - web_research_engine - INFO - JSON report saved: research_outputs/what_is_the_current_global_situation_con_20260217_152353.json
+2026-02-17 15:23:53,292 - web_research_engine - INFO - Markdown report saved: research_outputs/what_is_the_current_global_situation_con_20260217_152353.md
+2026-02-17 15:23:53,293 - web_research_engine - INFO - HTML report saved: research_outputs/what_is_the_current_global_situation_con_20260217_152353.html
+2026-02-17 15:23:53,293 - update_bwa_backend_1 - INFO - Research outputs saved → research_outputs/what_is_the_current_global_situation_con_20260217_152353.{json,md,html}
+2026-02-17 15:23:53,293 - update_bwa_backend_1 - INFO - Phase B – Ollama synthesis of 2 raw results
+2026-02-17 15:24:06,245 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 15:24:06,263 - update_bwa_backend_1 - ERROR - Ollama synthesis failed: llama runner process has terminated: signal: terminated (status code: 500) – falling back to raw results
+2026-02-17 15:24:06,264 - update_bwa_backend_1 - INFO - Phase B complete: 2 evidence items synthesised
+2026-02-17 15:24:06,264 - update_bwa_backend_1 - INFO - <<< research_node
+2026-02-17 15:24:06,278 - update_bwa_backend_1 - INFO - >>> orchestrator_node
+2026-02-17 15:24:19,559 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 15:24:19,581 - update_bwa_backend_1 - ERROR - Orchestrator LLM failed: llama runner process has terminated: signal: terminated (status code: 500) – using minimal fallback plan
+2026-02-17 15:24:19,582 - update_bwa_backend_1 - INFO - Orchestrator: 'Blog about what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview' – 1 tasks
+2026-02-17 15:24:19,582 - update_bwa_backend_1 - INFO - <<< orchestrator_node
+2026-02-17 15:24:19,595 - update_bwa_backend_1 - INFO - Fanout: dispatching 1 parallel worker tasks
+2026-02-17 15:24:19,603 - update_bwa_backend_1 - INFO - >>> worker_node – task 1: 'Introduction'
+2026-02-17 15:24:32,973 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 15:24:32,989 - update_bwa_backend_1 - ERROR - Worker LLM failed for task 1: llama runner process has terminated: signal: terminated (status code: 500)
+2026-02-17 15:24:32,990 - update_bwa_backend_1 - INFO - <<< worker_node – task 1
+2026-02-17 15:24:32,991 - update_bwa_backend_1 - INFO - >>> merge_content
+2026-02-17 15:24:32,991 - update_bwa_backend_1 - INFO - <<< merge_content
+2026-02-17 15:24:32,992 - update_bwa_backend_1 - INFO - >>> decide_images
+2026-02-17 15:24:46,071 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 15:24:46,091 - update_bwa_backend_1 - ERROR - Image planning failed: llama runner process has terminated: signal: terminated (status code: 500) – skipping images
+2026-02-17 15:24:46,092 - update_bwa_backend_1 - INFO - decide_images: 0 image spec(s)
+2026-02-17 15:24:46,092 - update_bwa_backend_1 - INFO - <<< decide_images
+2026-02-17 15:24:46,114 - update_bwa_backend_1 - INFO - >>> generate_images
+2026-02-17 15:24:46,114 - update_bwa_backend_1 - INFO - No image specs – nothing to generate
+2026-02-17 15:24:46,114 - update_bwa_backend_1 - INFO - <<< generate_images
+2026-02-17 15:24:46,115 - update_bwa_backend_1 - INFO - >>> place_images
+2026-02-17 15:24:46,122 - update_bwa_backend_1 - INFO - Final blog saved as: blog_about_what_is_the_current_global_situation_concerning_ai_in_todays_world_ai_global_situation_ai_regulation_ai_overview.md
+2026-02-17 15:24:46,122 - update_bwa_backend_1 - INFO - <<< place_images
+2026-02-17 15:27:42,434 - update_bwa_backend_1 - INFO - >>> router_node
+2026-02-17 15:27:56,793 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 15:27:56,827 - update_bwa_backend_1 - ERROR - Router LLM failed: llama runner process has terminated: signal: terminated (status code: 500) – defaulting to closed_book
+2026-02-17 15:27:56,828 - update_bwa_backend_1 - INFO - User mode override applied: open_book
+2026-02-17 15:27:56,828 - update_bwa_backend_1 - WARNING - Router returned no queries for research mode; using fallback: ["what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview", "what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview latest", "what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview news"]
+2026-02-17 15:27:56,828 - update_bwa_backend_1 - INFO - Router: mode=open_book, needs_research=True
+2026-02-17 15:27:56,830 - update_bwa_backend_1 - INFO - <<< router_node
+2026-02-17 15:27:56,849 - update_bwa_backend_1 - INFO - >>> research_node
+2026-02-17 15:27:57,055 - update_bwa_backend_1 - INFO - Phase A – DuckDuckGo search: 3 quer(ies) (timeout=90s)
+2026-02-17 15:27:57,058 - web_research_engine - INFO - ================================================================================
+2026-02-17 15:27:57,059 - web_research_engine - INFO - Starting research on: what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview
+2026-02-17 15:27:57,059 - web_research_engine - INFO - ================================================================================
+2026-02-17 15:27:57,059 - web_research_engine - INFO - Using 3 queries
+2026-02-17 15:27:57,059 - web_research_engine - INFO - 
+--- Query 1/3: what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview ---
+2026-02-17 15:27:57,059 - web_research_engine - INFO - Searching: 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview' (max_results=3)
+2026-02-17 15:27:57,065 - primp.impersonate - WARNING - Impersonate 'firefox_117' does not exist, using 'random'
+2026-02-17 15:27:57,292 - primp - INFO - response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=what%20is%20the%20current%20global%20situation%20concerning%20AI%20in%20today%27s%20world%3F%20AI%20global%20situation%20AI%20regulation%20AI_overview 200
+2026-02-17 15:27:57,419 - primp - INFO - response: https://grokipedia.com/api/typeahead?query=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview&limit=1 200
+2026-02-17 15:27:57,717 - ddgs.ddgs - INFO - Error in engine mojeek: DDGSException("HTTPError: HTTPError('HTTP 403 Forbidden for URL: https://www.mojeek.com/search?q=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview', 403, 'https://www.mojeek.com/search?q=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview', 'Forbidden')")
+2026-02-17 15:27:58,032 - primp - INFO - response: https://search.yahoo.com/search;_ylt=FjTDP2ADIxdFrTec6NP5SxR_;_ylu=Abza4-c-EMG4MhyiQ1mcAx7eG2Au5WVqyOv5rO2__tFqOZw?p=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview 200
+2026-02-17 15:27:58,614 - web_research_engine - INFO - Found 3 results for 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview'
+2026-02-17 15:27:58,614 - web_research_engine - INFO - Extracting content [1/3]: https://www.weforum.org/stories/2024/04/stanford-university-ai-index-report/
+2026-02-17 15:27:58,614 - web_research_engine - INFO - Fetching: https://www.weforum.org/stories/2024/04/stanford-university-ai-index-report/
+2026-02-17 15:27:58,733 - web_research_engine - WARNING - Failed to fetch https://www.weforum.org/stories/2024/04/stanford-university-ai-index-report/: HTTP 403
+2026-02-17 15:27:58,734 - web_research_engine - INFO - Extracting content [2/3]: https://www.forbes.com/sites/jasonsnyder/2025/01/19/beyond-the-illusionthe-real-threat-of-ai-wef-global-risks-report-2025/
+2026-02-17 15:27:59,615 - web_research_engine - INFO - Fetching: https://www.forbes.com/sites/jasonsnyder/2025/01/19/beyond-the-illusionthe-real-threat-of-ai-wef-global-risks-report-2025/
+2026-02-17 15:27:59,669 - web_research_engine - WARNING - Failed to fetch https://www.forbes.com/sites/jasonsnyder/2025/01/19/beyond-the-illusionthe-real-threat-of-ai-wef-global-risks-report-2025/: HTTP 403
+2026-02-17 15:27:59,669 - web_research_engine - INFO - 
+--- Query 2/3: what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview latest ---
+2026-02-17 15:27:59,669 - web_research_engine - INFO - Searching: 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview latest' (max_results=3)
+2026-02-17 15:27:59,672 - primp - INFO - response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=what%20is%20the%20current%20global%20situation%20concerning%20AI%20in%20today%27s%20world%3F%20AI%20global%20situation%20AI%20regulation%20AI_overview%20latest 200
+2026-02-17 15:27:59,681 - primp - INFO - response: https://grokipedia.com/api/typeahead?query=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview+latest&limit=1 200
+2026-02-17 15:27:59,741 - primp - INFO - response: https://www.google.com/search?q=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview+latest&filter=1&start=0&hl=en-US&lr=lang_en&cr=countryUS 200
+2026-02-17 15:28:00,282 - web_research_engine - INFO - Found 3 results for 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview latest'
+2026-02-17 15:28:00,282 - web_research_engine - INFO - Extracting content [1/3]: https://www.un.org/en/global-issues/artificial-intelligence
+2026-02-17 15:28:00,615 - web_research_engine - INFO - Fetching: https://www.un.org/en/global-issues/artificial-intelligence
+2026-02-17 15:28:00,820 - readability.readability - INFO - ruthless removal did not work. 
+2026-02-17 15:28:00,847 - web_research_engine - INFO -   ✓ Extracted 2315 words using readability
+2026-02-17 15:28:00,847 - web_research_engine - INFO - Extracting content [2/3]: https://hai.stanford.edu/ai-index/2025-ai-index-report
+2026-02-17 15:28:01,617 - web_research_engine - INFO - Fetching: https://hai.stanford.edu/ai-index/2025-ai-index-report
+2026-02-17 15:28:01,748 - web_research_engine - WARNING -   ✗ Content too short (89 words), skipping
+2026-02-17 15:28:01,748 - web_research_engine - INFO - 
+--- Query 3/3: what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview news ---
+2026-02-17 15:28:01,748 - web_research_engine - INFO - Searching: 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview news' (max_results=3)
+2026-02-17 15:28:01,751 - primp - INFO - response: https://en.wikipedia.org/w/api.php?action=opensearch&profile=fuzzy&limit=1&search=what%20is%20the%20current%20global%20situation%20concerning%20AI%20in%20today%27s%20world%3F%20AI%20global%20situation%20AI%20regulation%20AI_overview%20news 200
+2026-02-17 15:28:01,763 - primp - INFO - response: https://grokipedia.com/api/typeahead?query=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview+news&limit=1 200
+2026-02-17 15:28:02,039 - primp - INFO - response: https://search.brave.com/search?q=what+is+the+current+global+situation+concerning+AI+in+today%27s+world%3F+AI+global+situation+AI+regulation+AI_overview+news&source=web 200
+2026-02-17 15:28:02,046 - web_research_engine - INFO - Found 3 results for 'what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview news'
+2026-02-17 15:28:02,046 - web_research_engine - INFO - Extracting content [1/3]: https://iapp.org/news/a/global-ai-law-and-policy-tracker-highlights-and-takeaways
+2026-02-17 15:28:02,617 - web_research_engine - INFO - Fetching: https://iapp.org/news/a/global-ai-law-and-policy-tracker-highlights-and-takeaways
+2026-02-17 15:28:03,142 - web_research_engine - INFO -   ✓ Extracted 1543 words using readability
+2026-02-17 15:28:03,143 - web_research_engine - INFO - Extracting content [2/3]: https://www.mindfoundry.ai/blog/ai-regulations-around-the-world
+2026-02-17 15:28:03,617 - web_research_engine - INFO - Fetching: https://www.mindfoundry.ai/blog/ai-regulations-around-the-world
+2026-02-17 15:28:04,033 - web_research_engine - WARNING -   ✗ Content too short (27 words), skipping
+2026-02-17 15:28:04,033 - web_research_engine - INFO - 
+================================================================================
+2026-02-17 15:28:04,033 - web_research_engine - INFO - Research Complete!
+2026-02-17 15:28:04,033 - web_research_engine - INFO - ================================================================================
+2026-02-17 15:28:04,033 - web_research_engine - INFO - Queries: 3
+2026-02-17 15:28:04,033 - web_research_engine - INFO - Search Results: 9
+2026-02-17 15:28:04,034 - web_research_engine - INFO - Pages Fetched: 6
+2026-02-17 15:28:04,034 - web_research_engine - INFO - Successful Extractions: 2
+2026-02-17 15:28:04,034 - web_research_engine - INFO - Total Words: 3,974
+2026-02-17 15:28:04,034 - web_research_engine - INFO - Time Elapsed: 6.97s
+2026-02-17 15:28:04,034 - web_research_engine - INFO - ================================================================================
+
+2026-02-17 15:28:04,034 - update_bwa_backend_1 - INFO - Phase A complete: 2 raw results
+2026-02-17 15:28:04,036 - web_research_engine - INFO - JSON report saved: research_outputs/what_is_the_current_global_situation_con_20260217_152804.json
+2026-02-17 15:28:04,037 - web_research_engine - INFO - Markdown report saved: research_outputs/what_is_the_current_global_situation_con_20260217_152804.md
+2026-02-17 15:28:04,037 - web_research_engine - INFO - HTML report saved: research_outputs/what_is_the_current_global_situation_con_20260217_152804.html
+2026-02-17 15:28:04,037 - update_bwa_backend_1 - INFO - Research outputs saved → research_outputs/what_is_the_current_global_situation_con_20260217_152804.{json,md,html}
+2026-02-17 15:28:04,037 - update_bwa_backend_1 - INFO - Phase B – Ollama synthesis of 2 raw results
+2026-02-17 15:28:17,354 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 15:28:17,381 - update_bwa_backend_1 - ERROR - Ollama synthesis failed: llama runner process has terminated: signal: terminated (status code: 500) – falling back to raw results
+2026-02-17 15:28:17,383 - update_bwa_backend_1 - INFO - Phase B complete: 2 evidence items synthesised
+2026-02-17 15:28:17,383 - update_bwa_backend_1 - INFO - <<< research_node
+2026-02-17 15:28:17,462 - update_bwa_backend_1 - INFO - >>> orchestrator_node
+2026-02-17 15:28:30,644 - httpx - INFO - HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 500 Internal Server Error"
+2026-02-17 15:28:30,654 - update_bwa_backend_1 - ERROR - Orchestrator LLM failed: llama runner process has terminated: signal: terminated (status code: 500) – using minimal fallback plan
+2026-02-17 15:28:30,655 - update_bwa_backend_1 - INFO - Orchestrator: 'Blog about what is the current global situation concerning AI in today's world? AI global situation AI regulation AI_overview' – 1 tasks
+2026-02-17 15:28:30,655 - update_bwa_backend_1 - INFO - <<< orchestrator_node
+2026-02-17 15:28:30,660 - update_bwa_backend_1 - INFO - Fanout: dispatching 1 parallel worker tasks
+2026-02-17 15:28:30,661 - update_bwa_backend_1 - INFO - >>> worker_node – task 1: 'Introduction'
