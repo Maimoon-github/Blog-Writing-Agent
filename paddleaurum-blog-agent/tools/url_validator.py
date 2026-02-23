@@ -1,49 +1,100 @@
-"""URL format validation and accessibility checking."""
+"""tools/url_validator.py
+
+URL format validation and HTTP accessibility checking.
+
+`validate_url` performs a regex format check only — no network call.
+`check_url_accessibility` issues a HEAD request (falling back to GET if HEAD
+is refused or returns a 4xx/5xx) to determine whether a URL is reachable.
+This HEAD→GET fallback pattern mirrors the logic in nodes/citation_formatter.py
+so that the tool and the node always agree on URL validity.
+"""
+
+from __future__ import annotations
 
 import re
-import requests
-from urllib.parse import urlparse
 from typing import Optional, Tuple
+from urllib.parse import urlparse
 
-# Simple regex for URL format (does not guarantee existence)
-URL_REGEX = re.compile(
-    r"^(https?|ftp)://"  # scheme
-    r"([a-zA-Z0-9.-]+)"   # domain
-    r"(\.[a-zA-Z]{2,})?"  # tld
-    r"(:\d+)?"            # port
-    r"(/.*)?$",           # path
+import requests
+
+# ── URL format regex ──────────────────────────────────────────────────────────
+_URL_PATTERN = re.compile(
+    r"^https?://"              # scheme — only http/https accepted
+    r"[a-zA-Z0-9.-]+"          # hostname (labels)
+    r"(\.[a-zA-Z]{2,})?"       # optional TLD
+    r"(:\d{1,5})?"             # optional port
+    r"(/[^\s]*)?$",            # optional path/query/fragment
     re.IGNORECASE,
 )
 
+_DEFAULT_TIMEOUT: float = 8.0     # seconds — matches citation_formatter timeout
+_ACCESSIBLE_STATUSES: range = range(200, 400)  # 2xx and 3xx
+
 
 def validate_url(url: str) -> bool:
-    """Check if the string is a valid URL format."""
-    return bool(URL_REGEX.match(url))
+    """
+    Return True if `url` matches a well-formed http/https URL pattern.
+
+    This is a pure format check — no network request is made.
+
+    Parameters
+    ----------
+    url : String to validate.
+
+    Returns
+    -------
+    bool
+    """
+    if not url or not isinstance(url, str):
+        return False
+    return bool(_URL_PATTERN.match(url.strip()))
 
 
 def check_url_accessibility(
     url: str,
-    timeout: float = 5.0,
-    allow_redirects: bool = True,
+    timeout: float = _DEFAULT_TIMEOUT,
 ) -> Tuple[bool, Optional[int], Optional[str]]:
     """
-    Perform a HEAD request to verify the URL is accessible.
+    Verify that `url` is reachable over HTTP/HTTPS.
 
-    Returns:
-        (accessible, status_code, error_message)
+    Attempts a HEAD request first.  If the server refuses HEAD or returns
+    a non-successful status, falls back to a GET request — matching the
+    strategy used in nodes/citation_formatter.py.
+
+    Parameters
+    ----------
+    url     : The URL to probe.
+    timeout : Per-request timeout in seconds.
+
+    Returns
+    -------
+    (accessible: bool, status_code: int | None, error: str | None)
+        accessible  — True if the URL returned a 2xx or 3xx response.
+        status_code — Final HTTP status code, or None on connection failure.
+        error       — Human-readable error message, or None on success.
     """
     if not validate_url(url):
-        return False, None, "Invalid URL format"
+        return False, None, "Invalid URL format."
 
+    # ── HEAD request ─────────────────────────────────────────────────────────
     try:
-        # Use HEAD request to be lightweight
-        response = requests.head(
+        head_resp = requests.head(url, timeout=timeout, allow_redirects=True)
+        if head_resp.status_code in _ACCESSIBLE_STATUSES:
+            return True, head_resp.status_code, None
+        # HEAD succeeded but returned an error status — fall through to GET
+    except requests.exceptions.RequestException:
+        pass  # server may not support HEAD — fall through to GET
+
+    # ── GET fallback ──────────────────────────────────────────────────────────
+    try:
+        get_resp = requests.get(
             url,
             timeout=timeout,
-            allow_redirects=allow_redirects,
+            allow_redirects=True,
+            stream=True,   # avoid downloading the full body
         )
-        # Consider 2xx and 3xx as accessible
-        accessible = 200 <= response.status_code < 400
-        return accessible, response.status_code, None
-    except requests.exceptions.RequestException as e:
-        return False, None, str(e)
+        get_resp.close()
+        accessible = get_resp.status_code in _ACCESSIBLE_STATUSES
+        return accessible, get_resp.status_code, None
+    except requests.exceptions.RequestException as exc:
+        return False, None, str(exc)

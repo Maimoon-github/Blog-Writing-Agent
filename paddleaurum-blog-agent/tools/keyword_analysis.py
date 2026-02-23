@@ -1,41 +1,75 @@
-"""Keyword density calculation and LSI term extraction."""
+"""tools/keyword_analysis.py
+
+Keyword density calculation and LSI term extraction.
+
+Design notes
+------------
+`calculate_keyword_density` uses phrase-level matching with re.escape so that
+multi-word primary keywords (e.g. "pickleball kitchen rules") are counted as
+full-phrase occurrences divided by total word count.  This is identical to the
+formula used in nodes/seo_auditor.py so that tool output and auditor scores
+are always consistent.
+
+Word count uses `re.findall(r"\\b\\w+\\b", text)` — the same tokeniser used
+in nodes/seo_auditor.py and tools/word_count.py.
+"""
+
+from __future__ import annotations
 
 import re
 from collections import Counter
 from typing import List, Optional
 
-# Simple stopword list (extend as needed)
-STOPWORDS = {
+# ── Stop-word set ─────────────────────────────────────────────────────────────
+# frozenset for O(1) membership tests.
+_STOPWORDS: frozenset[str] = frozenset({
     "a", "an", "the", "and", "or", "but", "if", "because", "as", "what",
     "which", "this", "that", "these", "those", "then", "just", "so", "than",
     "such", "both", "through", "about", "for", "is", "of", "while", "during",
     "to", "from", "in", "on", "at", "by", "with", "without", "after", "before",
-}
+    "are", "was", "were", "be", "been", "being", "have", "has", "had", "do",
+    "does", "did", "will", "would", "could", "should", "may", "might", "shall",
+    "not", "no", "its", "it", "we", "you", "he", "she", "they", "i", "my",
+    "your", "our", "their", "also", "can", "more", "all", "into", "up",
+})
+
+
+def _token_count(text: str) -> int:
+    """Count words using the same tokeniser as seo_auditor._count_words."""
+    return len(re.findall(r"\b\w+\b", text))
 
 
 def calculate_keyword_density(text: str, keyword: str) -> float:
     """
-    Calculate the percentage of keyword occurrences relative to total words.
+    Return keyword density as a percentage of total word count.
 
-    Args:
-        text: The full article text.
-        keyword: The keyword to count (case‑insensitive).
+    Phrase-level matching is used so that multi-word keywords (e.g.
+    "pickleball kitchen rules") are counted as complete-phrase occurrences.
+    This matches the formula in nodes/seo_auditor.py:
 
-    Returns:
-        Density as a float between 0 and 100.
+        occurrences = len(re.findall(re.escape(keyword.lower()), text.lower()))
+        density = (occurrences / total_words) * 100
+
+    Parameters
+    ----------
+    text    : Full article text (Markdown or plain).
+    keyword : Keyword or keyword phrase (case-insensitive).
+
+    Returns
+    -------
+    float
+        Density as a percentage (e.g. 1.5 means 1.5%).
+        Returns 0.0 if either argument is empty.
     """
     if not text or not keyword:
         return 0.0
 
-    # Normalize: lowercase and split on whitespace
-    words = re.findall(r"\b\w+\b", text.lower())
-    if not words:
+    total_words = _token_count(text)
+    if total_words == 0:
         return 0.0
 
-    keyword_lower = keyword.lower()
-    # Count whole‑word matches only
-    count = sum(1 for w in words if w == keyword_lower)
-    return (count / len(words)) * 100.0
+    occurrences = len(re.findall(re.escape(keyword.lower()), text.lower()))
+    return round((occurrences / total_words) * 100, 2)
 
 
 def extract_lsi_terms(
@@ -45,35 +79,42 @@ def extract_lsi_terms(
     exclude: Optional[List[str]] = None,
 ) -> List[str]:
     """
-    Extract Latent Semantic Indexing (LSI) terms – frequently occurring,
-    content‑bearing words from the text.
+    Extract the top-N content-bearing words from text as LSI term candidates.
 
-    Args:
-        text: The article text.
-        top_n: Number of top terms to return.
-        min_word_length: Minimum length of words to consider.
-        exclude: Additional words to exclude (besides STOPWORDS).
+    Words are ranked by frequency after removing stop words, the caller-supplied
+    exclusion list, and any words shorter than `min_word_length`.  Callers should
+    pass the primary keyword and its component words via `exclude` so that the
+    keyword itself does not appear in the LSI list.
 
-    Returns:
-        List of LSI term strings, ordered by frequency descending.
+    Parameters
+    ----------
+    text            : Article text to analyse.
+    top_n           : Maximum number of terms to return.
+    min_word_length : Minimum character length for a word to be included.
+    exclude         : Additional words/phrases to suppress (e.g. the primary
+                      keyword and its individual tokens).
+
+    Returns
+    -------
+    List[str]
+        Unique terms ordered by descending frequency.
     """
     if not text:
         return []
 
-    # Tokenize and filter
-    words = re.findall(r"\b[a-zA-Z]+\b", text.lower())
-    if not words:
-        return []
-
-    exclude_set = set(STOPWORDS)
+    # Build exclusion set: stop words + caller-supplied extras + their tokens
+    exclude_tokens: set[str] = set(_STOPWORDS)
     if exclude:
-        exclude_set.update(w.lower() for w in exclude)
+        for phrase in exclude:
+            exclude_tokens.add(phrase.lower())
+            # Also exclude individual words within multi-word phrases
+            exclude_tokens.update(re.findall(r"\b[a-zA-Z]+\b", phrase.lower()))
 
-    # Count frequencies of valid words
-    counter = Counter(
+    words = re.findall(r"\b[a-zA-Z]+\b", text.lower())
+    filtered = [
         w for w in words
-        if w not in exclude_set and len(w) >= min_word_length
-    )
+        if w not in exclude_tokens and len(w) >= min_word_length
+    ]
 
-    # Return top N terms
-    return [word for word, _ in counter.most_common(top_n)]
+    counter = Counter(filtered)
+    return [term for term, _ in counter.most_common(top_n)]
