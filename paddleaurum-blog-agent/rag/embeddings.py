@@ -1,19 +1,36 @@
-"""HuggingFace sentence-transformers embedding setup."""
+"""rag/embeddings.py
+
+HuggingFace sentence-transformers embedding setup.
+
+Imports EMBEDDING_MODEL from config/settings.py so the model name is defined
+in exactly one place for both ingestion (rag/) and retrieval (tools/rag_retrieval.py).
+"""
 
 import os
+
 from langchain_huggingface import HuggingFaceEmbeddings
 
-# Default embedding model (all-MiniLM-L6-v2)
-DEFAULT_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+from config.settings import EMBEDDING_MODEL
+
+# Use GPU if available; fall back to CPU automatically.
+_DEVICE: str = os.getenv("EMBEDDING_DEVICE", "cpu")
 
 
-def get_embedding_function(model_name: str = DEFAULT_MODEL_NAME) -> HuggingFaceEmbeddings:
+def get_embedding_function(model_name: str = EMBEDDING_MODEL) -> HuggingFaceEmbeddings:
     """
-    Returns a HuggingFaceEmbeddings instance for the given model.
-    The model is downloaded and cached locally on first use.
+    Return a HuggingFaceEmbeddings instance for the given model.
+
+    The model is downloaded and cached locally on first call.
+    Embeddings are L2-normalised, which is required for cosine-similarity
+    searches in ChromaDB.
+
+    Parameters
+    ----------
+    model_name : Sentence-transformers model identifier.
+                 Defaults to EMBEDDING_MODEL from config/settings.py.
     """
     return HuggingFaceEmbeddings(
         model_name=model_name,
-        model_kwargs={"device": "cpu"},  # or "cuda" if GPU available
+        model_kwargs={"device": _DEVICE},
         encode_kwargs={"normalize_embeddings": True},
     )
