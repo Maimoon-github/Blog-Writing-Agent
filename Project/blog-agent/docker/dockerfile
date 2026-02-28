@@ -1,0 +1,47 @@
+FROM python:3.11-slim
+
+# Set environment variables for Python optimization
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Set working directory
+WORKDIR /app
+
+# Create non-root user
+RUN groupadd --system appuser && \
+    useradd --system --gid appuser --no-create-home appuser
+
+# Create necessary directories and set ownership
+RUN mkdir -p /app/outputs/images \
+             /app/outputs/blogs \
+             /app/outputs/logs \
+             /app/memory/cache \
+             /app/memory/chroma_data && \
+    chown -R appuser:appuser /app
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY . .
+
+# Healthcheck to verify Streamlit is running
+HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health || exit 1
+
+# Switch to non-root user
+USER appuser
+
+# Expose Streamlit default port
+EXPOSE 8501
+
+# Run Streamlit application
+CMD ["streamlit", "run", "app/ui.py", \
+     "--server.port=8501", \
+     "--server.address=0.0.0.0", \
+     "--server.headless=true", \
+     "--server.fileWatcherType=none"]

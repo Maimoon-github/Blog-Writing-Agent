@@ -1,0 +1,71 @@
+version: '3.8'
+
+volumes:
+  ollama_models:
+
+services:
+  searxng:
+    image: searxng/searxng:latest
+    container_name: blog-agent-searxng
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./searxng/settings.yml:/etc/searxng/settings.yml:ro
+      - searxng_data:/etc/searxng/data
+    restart: always
+    networks:
+      - blog_agent_network
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: blog-agent-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    restart: always
+    networks:
+      - blog_agent_network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: blog-agent-app
+    depends_on:
+      - searxng
+      - ollama
+    ports:
+      - "8501:8501"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - SEARXNG_BASE_URL=http://searxng:8080
+    env_file:
+      - ../.env
+    volumes:
+      - ../outputs:/app/outputs
+      - ../memory:/app/memory
+    restart: on-failure
+    networks:
+      - blog_agent_network
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  blog_agent_network:
+    driver: bridge
+
+volumes:
+  ollama_models:
+  searxng_data:
