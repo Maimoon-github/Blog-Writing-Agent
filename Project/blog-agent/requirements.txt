@@ -5,30 +5,54 @@
 # ================================================
 
 # ── Core LangGraph + LangChain (orchestrator-worker pattern)
-langgraph==1.0.9
-langchain-community==0.4.1
-langgraph-checkpoint-sqlite==3.0.3
+# langgraph==1.0.9
+# langchain-community==0.4.1
+# langgraph-checkpoint-sqlite==3.0.3
 
 # ── UI
-streamlit==1.54.0
+# streamlit==1.54.0
 
 # ── Vector store (Phase 2 RAG)
-chromadb==1.5.1
+# chromadb==1.5.1
 
 # ── Image Generation (Stable Diffusion v1.4)
 # IMPORTANT: Install Torch + CUDA FIRST (required for GPU acceleration)
 # Run this BEFORE pip install -r requirements.txt:
 # pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126
-torch==2.10.0
-torchvision==0.21.0
-torchaudio==2.10.0
-diffusers==0.36.0
+# torch==2.10.0
+# torchvision==0.21.0
+# torchaudio==2.10.0
+# diffusers==0.36.0
 
 # ── Tools & Utilities
-beautifulsoup4==4.14.3
-httpx==0.28.1
-markdown==3.10.2
-structlog==25.5.0
+# beautifulsoup4==4.14.3
+# httpx==0.28.1
+# markdown==3.10.2
+# structlog==25.5.0
 
 # ── Structured outputs (BlogPlan, Section, etc.)
-pydantic==2.10.3
+# pydantic==2.10.3
+
+
+
+langgraph>=0.2.0
+langchain>=0.2.0
+langchain-community>=0.2.0
+langchain-ollama>=0.1.0
+ollama>=0.2.0
+diffusers>=0.27.0
+transformers>=4.40.0
+accelerate>=0.30.0
+torch>=2.2.0
+streamlit>=1.35.0
+chromadb>=0.5.0
+httpx>=0.27.0
+beautifulsoup4>=4.12.0
+pydantic>=2.7.0
+structlog>=24.1.0
+python-dotenv>=1.0.0
+duckduckgo-search>=6.1.0
+Pillow>=10.3.0
+markdown>=3.6
+pytest>=8.2.0
+pytest-asyncio>=0.23.0
