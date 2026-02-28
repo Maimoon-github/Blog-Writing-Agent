@@ -63,9 +63,9 @@ tests/__pycache__/
 .streamlit/
 
 # Docker
-# .dockerignore
-# Dockerfile
-# docker-compose.yml
+.dockerignore
+Dockerfile
+docker-compose.yml
 
 # Credentials (explicitly)
 .env
