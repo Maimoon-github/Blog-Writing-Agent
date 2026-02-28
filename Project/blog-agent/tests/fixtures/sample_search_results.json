@@ -1,0 +1,28 @@
+### tests/fixtures/sample_search_results.json
+[
+  {
+    "title": "AI Trends 2025: The Rise of Generative AI",
+    "url": "https://example.com/ai-trends-2025-generative",
+    "snippet": "Generative AI is expected to revolutionize content creation and software development. Companies are investing heavily in multimodal models that can process text, images, and video seamlessly."
+  },
+  {
+    "title": "Edge AI: Bringing Intelligence to Devices",
+    "url": "https://example.com/edge-ai-devices-2025",
+    "snippet": "By 2025, more AI inference will happen on edge devices rather than in the cloud. This shift reduces latency and improves privacy, enabling real-time applications in autonomous vehicles and smart cameras."
+  },
+  {
+    "title": "AI Regulation and Ethics in 2025",
+    "url": "https://example.com/ai-regulation-ethics-2025",
+    "snippet": "Governments worldwide are implementing stricter regulations for high-risk AI systems. The EU AI Act is expected to serve as a blueprint, requiring transparency and human oversight for critical applications."
+  },
+  {
+    "title": "Foundation Models: The New Building Blocks",
+    "url": "https://example.com/foundation-models-2025",
+    "snippet": "Large language models are evolving into foundation models that can be fine-tuned for virtually any task. Researchers are focusing on efficiency improvements to reduce the carbon footprint of training such models."
+  },
+  {
+    "title": "AI in Healthcare: Diagnostic Breakthroughs",
+    "url": "https://example.com/ai-healthcare-2025",
+    "snippet": "AI-powered diagnostic tools are achieving accuracy levels comparable to specialist physicians. From radiology to genomics, these systems are helping doctors detect diseases earlier and personalize treatments."
+  }
+]

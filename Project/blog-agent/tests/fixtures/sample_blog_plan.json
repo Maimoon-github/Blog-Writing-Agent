@@ -1,0 +1,40 @@
+### tests/fixtures/sample_blog_plan.json
+{
+  "blog_title": "The Future of AI in 2025",
+  "feature_image_prompt": "A futuristic abstract representation of artificial intelligence, with glowing neural networks, data streams, and a blend of human and machine elements, digital art style, high resolution.",
+  "research_required": true,
+  "sections": [
+    {
+      "id": "section_1",
+      "title": "Introduction to AI Trends",
+      "description": "Overview of the most significant AI developments expected in 2025, including generative AI, edge computing, and regulatory changes.",
+      "word_count": 450,
+      "search_query": "AI trends 2025 overview",
+      "image_prompt": "Abstract visualization of interconnected AI models"
+    },
+    {
+      "id": "section_2",
+      "title": "Generative AI Goes Mainstream",
+      "description": "How generative AI (text, image, video) is being integrated into everyday business tools and creative workflows.",
+      "word_count": 500,
+      "search_query": "generative AI applications 2025",
+      "image_prompt": "An artist collaborating with an AI to create digital art"
+    },
+    {
+      "id": "section_3",
+      "title": "Edge AI and Real‑Time Intelligence",
+      "description": "The shift toward on‑device AI for low‑latency, privacy‑preserving applications in IoT, automotive, and healthcare.",
+      "word_count": 400,
+      "search_query": "edge AI advances 2025",
+      "image_prompt": "A smart city with edge nodes processing data in real time"
+    },
+    {
+      "id": "section_4",
+      "title": "Conclusion: Preparing for an AI‑Driven World",
+      "description": "Final thoughts on how individuals and organizations can adapt to the rapid evolution of AI.",
+      "word_count": 300,
+      "search_query": null,
+      "image_prompt": "Human and robot shaking hands in a collaborative future"
+    }
+  ]
+}

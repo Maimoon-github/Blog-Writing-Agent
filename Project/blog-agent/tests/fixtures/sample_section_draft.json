@@ -1,0 +1,7 @@
+### tests/fixtures/sample_section_draft.json
+{
+  "section_id": "section_1",
+  "title": "Introduction to AI Trends",
+  "content": "Artificial intelligence continues to evolve at a breathtaking pace, with 2025 poised to be a landmark year. One of the most significant developments is the maturation of generative AI, which now produces high‑quality text, images, and even code that rivals human output [SOURCE_1]. This technology is being embedded into everyday tools, from office suites to creative software, democratizing access to powerful creative capabilities. \n\nAnother trend reshaping the landscape is edge AI. Instead of relying solely on cloud servers, an increasing amount of inference occurs directly on devices such as smartphones, cameras, and industrial sensors [SOURCE_2]. This shift reduces latency, enhances privacy, and enables real‑time applications in autonomous systems. \n\n[IMAGE_PLACEHOLDER_section_1]\n\nRegulation is also catching up with innovation. The EU AI Act, expected to be fully implemented by 2025, sets strict requirements for high‑risk AI systems, demanding transparency, human oversight, and accountability. These rules are influencing global standards and pushing companies to adopt ethical AI practices. Together, these trends paint a picture of an AI ecosystem that is more capable, distributed, and regulated than ever before.",
+  "citation_keys": ["[SOURCE_1]", "[SOURCE_2]"]
+}
