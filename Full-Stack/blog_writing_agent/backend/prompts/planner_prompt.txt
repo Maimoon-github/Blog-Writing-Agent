@@ -1,1 +1,0 @@
-# Structured BlogPlan generation prompt

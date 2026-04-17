@@ -84,3 +84,7 @@ docker-compose.yml
 # Jupyter notebooks (if any)
 .ipynb_checkpoints/
 *.ipynb
+
+# temp files
+temp/
+/temp

@@ -1,1 +1,0 @@
-# Final output hallucination and safety review prompt
