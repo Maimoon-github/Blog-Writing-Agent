@@ -1,0 +1,15 @@
+langgraph>=0.2.0
+langchain-core
+langchain-community
+langchain-ollama
+pydantic
+python-dotenv
+httpx
+beautifulsoup4
+crewai
+# Phase 2+ (uncomment when needed)
+# streamlit
+# diffusers
+# torch
+# torchvision
+# torchaudio
