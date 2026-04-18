@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autonomous Blog Agent — Implementation Roadmap</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0f11;
+    --surface: #16181c;
+    --surface2: #1e2127;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #e8e9ec;
+    --muted: #7e8290;
+    --dim: #4a4d57;
+    --accent: #7c6dfa;
+    --accent2: #5dd9c4;
+    --accent3: #f4a836;
+    --accent4: #f06b6b;
+    --accent5: #70c6f8;
+    --green: #5ecf8e;
+    --pink: #e87ab7;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 0 0 80px;
+  }
+
+  /* HERO */
+  .hero {
+    padding: 72px 48px 60px;
+    border-bottom: 1px solid var(--border);
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent2);
+    background: rgba(93,217,196,0.1);
+    border: 1px solid rgba(93,217,196,0.2);
+    border-radius: 20px;
+    padding: 4px 12px;
+    margin-bottom: 28px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(36px, 5vw, 58px);
+    font-weight: 300;
+    line-height: 1.12;
+    color: #fff;
+    margin-bottom: 18px;
+    letter-spacing: -0.02em;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .hero p {
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 640px;
+    line-height: 1.75;
+    margin-bottom: 36px;
+  }
+  .stack-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.03em;
+  }
+  .pill.purple { background: rgba(124,109,250,0.15); color: #a99ef7; border: 1px solid rgba(124,109,250,0.2); }
+  .pill.teal   { background: rgba(93,217,196,0.12); color: #7de8d4; border: 1px solid rgba(93,217,196,0.2); }
+  .pill.amber  { background: rgba(244,168,54,0.12); color: #f7c070; border: 1px solid rgba(244,168,54,0.2); }
+  .pill.blue   { background: rgba(112,198,248,0.12); color: #93d3f9; border: 1px solid rgba(112,198,248,0.2); }
+  .pill.pink   { background: rgba(232,122,183,0.12); color: #f0a3cc; border: 1px solid rgba(232,122,183,0.2); }
+  .pill.red    { background: rgba(240,107,107,0.12); color: #f59292; border: 1px solid rgba(240,107,107,0.2); }
+  .pill.green  { background: rgba(94,207,142,0.12); color: #85dba8; border: 1px solid rgba(94,207,142,0.2); }
+
+  /* LAYOUT */
+  .page { max-width: 1100px; margin: 0 auto; padding: 0 48px; }
+
+  /* NAV */
+  .toc {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 52px 0 64px;
+  }
+  .toc-item {
+    background: var(--surface);
+    padding: 16px 20px;
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 13px;
+    transition: background 0.15s, color 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .toc-item:hover { background: var(--surface2); color: var(--text); }
+  .toc-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--dim);
+    background: var(--bg);
+    border-radius: 3px;
+    padding: 2px 5px;
+    min-width: 24px;
+    text-align: center;
+  }
+
+  /* SECTION */
+  .section { margin-bottom: 80px; }
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 36px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--dim);
+    padding-top: 8px;
+    min-width: 28px;
+  }
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-size: 30px;
+    font-weight: 300;
+    color: #fff;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .section-sub {
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* FILE TREE */
+  .filetree {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    overflow-x: auto;
+    margin-bottom: 32px;
+  }
+  .tree-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    padding: 4px 0;
+    border-radius: 5px;
+    transition: background 0.1s;
+  }
+  .tree-row:hover { background: rgba(255,255,255,0.03); }
+  .tree-indent { color: var(--dim); white-space: pre; }
+  .tree-icon { margin-right: 8px; }
+  .tree-name { color: var(--text); }
+  .tree-name.folder { color: var(--accent5); }
+  .tree-name.config { color: var(--accent3); }
+  .tree-name.entry  { color: var(--accent); }
+  .tree-name.agent  { color: var(--pink); }
+  .tree-name.prompt { color: var(--accent2); }
+  .tree-name.tool   { color: var(--green); }
+  .tree-name.output { color: var(--dim); }
+  .tree-desc {
+    margin-left: auto;
+    color: var(--dim);
+    font-size: 11px;
+    padding-left: 24px;
+    text-align: right;
+    white-space: nowrap;
+    font-style: italic;
+  }
+
+  /* FILE CARDS */
+  .file-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+  .file-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    transition: border-color 0.2s;
+  }
+  .file-card:hover { border-color: var(--border2); }
+  .file-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .file-card-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 12.5px;
+    color: var(--accent);
+  }
+  .file-card-name.agent  { color: var(--pink); }
+  .file-card-name.tool   { color: var(--green); }
+  .file-card-name.prompt { color: var(--accent2); }
+  .file-card-name.config { color: var(--accent3); }
+  .file-card-name.entry  { color: var(--accent5); }
+  .file-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .file-card ul { list-style: none; padding: 0; margin-top: 8px; }
+  .file-card li {
+    font-size: 12.5px;
+    color: var(--muted);
+    padding: 2px 0;
+    padding-left: 14px;
+    position: relative;
+  }
+  .file-card li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--dim);
+  }
+
+  /* PHASE BLOCKS */
+  .phase {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .phase-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding: 3px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+  .phase-badge.p1 { background: rgba(124,109,250,0.2); color: #b0a5fb; border: 1px solid rgba(124,109,250,0.25); }
+  .phase-badge.p2 { background: rgba(93,217,196,0.15); color: #7de8d4; border: 1px solid rgba(93,217,196,0.2); }
+  .phase-badge.p3 { background: rgba(244,168,54,0.15); color: #f7c070; border: 1px solid rgba(244,168,54,0.2); }
+  .phase-badge.p4 { background: rgba(94,207,142,0.15); color: #85dba8; border: 1px solid rgba(94,207,142,0.2); }
+  .phase-title { font-weight: 600; font-size: 15px; color: var(--text); }
+  .phase-time {
+    margin-left: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--dim);
+  }
+  .phase-body { padding: 24px; }
+
+  /* STEPS */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step {
+    display: flex;
+    gap: 16px;
+    position: relative;
+    padding-bottom: 28px;
+  }
+  .step:last-child { padding-bottom: 0; }
+  .step-left { display: flex; flex-direction: column; align-items: center; }
+  .step-dot {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    flex-shrink: 0;
+    z-index: 1;
+  }
+  .step-dot.p1 { background: rgba(124,109,250,0.25); color: #b0a5fb; border: 1px solid rgba(124,109,250,0.3); }
+  .step-dot.p2 { background: rgba(93,217,196,0.2); color: #7de8d4; border: 1px solid rgba(93,217,196,0.25); }
+  .step-dot.p3 { background: rgba(244,168,54,0.2); color: #f7c070; border: 1px solid rgba(244,168,54,0.25); }
+  .step-dot.p4 { background: rgba(94,207,142,0.2); color: #85dba8; border: 1px solid rgba(94,207,142,0.25); }
+  .step-line {
+    width: 1px;
+    flex: 1;
+    margin-top: 6px;
+    background: var(--border);
+  }
+  .step:last-child .step-line { display: none; }
+  .step-content { flex: 1; padding-top: 3px; }
+  .step-name { font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 5px; }
+  .step-desc { font-size: 13px; color: var(--muted); line-height: 1.65; }
+  .step-code {
+    margin-top: 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--accent2);
+    overflow-x: auto;
+    white-space: pre;
+    line-height: 1.7;
+  }
+  .step-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .step-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10.5px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    background: var(--surface2);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  /* AGENT TABLE */
+  .agent-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .agent-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    transition: border-color 0.2s;
+  }
+  .agent-card:hover { border-color: var(--border2); }
+  .agent-card-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .agent-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  .agent-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .agent-role { font-size: 11.5px; color: var(--muted); margin-bottom: 6px; }
+  .agent-file {
+    font-family: 'DM Mono', monospace;
+    font-size: 10.5px;
+    color: var(--pink);
+    background: rgba(232,122,183,0.08);
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid rgba(232,122,183,0.15);
+  }
+
+  /* FLOW DIAGRAM */
+  .flow-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 32px;
+    overflow-x: auto;
+  }
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-width: 600px;
+  }
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    justify-content: center;
+  }
+  .flow-box {
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .flow-box.ui    { background: rgba(112,198,248,0.15); color: var(--accent5); border: 1px solid rgba(112,198,248,0.2); }
+  .flow-box.super { background: rgba(124,109,250,0.15); color: #b0a5fb; border: 1px solid rgba(124,109,250,0.2); }
+  .flow-box.worker { background: rgba(232,122,183,0.12); color: var(--pink); border: 1px solid rgba(232,122,183,0.18); }
+  .flow-box.tool  { background: rgba(94,207,142,0.12); color: var(--green); border: 1px solid rgba(94,207,142,0.18); }
+  .flow-box.out   { background: rgba(244,168,54,0.12); color: var(--accent3); border: 1px solid rgba(244,168,54,0.2); }
+  .flow-arrow {
+    color: var(--dim);
+    font-size: 18px;
+    padding: 0 6px;
+    user-select: none;
+  }
+  .flow-arrow.down {
+    display: flex;
+    justify-content: center;
+    font-size: 16px;
+    margin: 4px 0;
+  }
+  .flow-parallel {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 8px 0;
+  }
+  .flow-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--dim);
+    text-align: center;
+    margin: 4px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* SCHEMA BLOCK */
+  .schema-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    margin: 10px 0;
+    overflow-x: auto;
+  }
+  .schema-kw   { color: var(--accent); }
+  .schema-cls  { color: var(--accent2); }
+  .schema-fld  { color: var(--text); }
+  .schema-type { color: var(--accent3); }
+  .schema-cmt  { color: var(--dim); }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; padding: 0; margin: 16px 0; }
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .check-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+  .check-label { line-height: 1.5; }
+  .check-label strong { color: var(--text); font-weight: 600; }
+
+  /* CALLOUT */
+  .callout {
+    display: flex;
+    gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin: 20px 0;
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+  .callout.warn { border-left-color: var(--accent3); }
+  .callout.tip  { border-left-color: var(--accent2); }
+  .callout strong { color: var(--text); }
+
+  /* DIVIDER */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 56px 0; }
+
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    .hero, .page { padding-left: 24px; padding-right: 24px; }
+    .tree-desc { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">📐 Implementation Roadmap</div>
+  <h1>Autonomous <em>Blog Generation</em><br>Agent — Build Guide</h1>
+  <p>A start-to-finish technical roadmap for the 8-agent parallel pipeline. Covers hierarchy mapping, environment setup, file-by-file implementation logic, and testing strategy.</p>
+  <div class="stack-pills">
+    <span class="pill purple">CrewAI</span>
+    <span class="pill amber">Ollama · Mistral 7B</span>
+    <span class="pill blue">SearxNG</span>
+    <span class="pill pink">Stable Diffusion v1.4</span>
+    <span class="pill teal">ChromaDB</span>
+    <span class="pill green">Streamlit</span>
+    <span class="pill red">100% Local · No API Keys</span>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- TOC -->
+  <nav class="toc">
+    <a class="toc-item" href="#architecture"><span class="toc-num">00</span>Architecture overview</a>
+    <a class="toc-item" href="#hierarchy"><span class="toc-num">01</span>File hierarchy map</a>
+    <a class="toc-item" href="#phase1"><span class="toc-num">02</span>Phase 1 — Environment</a>
+    <a class="toc-item" href="#phase2"><span class="toc-num">03</span>Phase 2 — Foundation</a>
+    <a class="toc-item" href="#phase3"><span class="toc-num">04</span>Phase 3 — Agent logic</a>
+    <a class="toc-item" href="#phase4"><span class="toc-num">05</span>Phase 4 — Test &amp; deploy</a>
+  </nav>
+
+  <!-- SECTION 0: ARCHITECTURE -->
+  <section class="section" id="architecture">
+    <div class="section-header">
+      <div class="section-num">00</div>
+      <div>
+        <div class="section-title">Architecture Overview</div>
+        <div class="section-sub">8-agent orchestrator–worker hierarchy with parallel crew dispatch</div>
+      </div>
+    </div>
+
+    <div class="flow-wrap">
+      <div class="flow">
+        <div class="flow-row">
+          <div class="flow-box ui">🖥️ Streamlit UI — topic input</div>
+        </div>
+        <div class="flow-arrow down">↓</div>
+        <div class="flow-row">
+          <div class="flow-box super">🔀 Router — intent classifier</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box super">📋 Planner — BlogPlan (Pydantic)</div>
+        </div>
+        <div class="flow-arrow down">↓ asyncio.gather parallel dispatch</div>
+        <div class="flow-label">Worker layer — fires simultaneously per section</div>
+        <div class="flow-parallel">
+          <div class="flow-box worker">🔍 Researcher × N</div>
+          <div class="flow-box worker">✍️ Writer × N</div>
+          <div class="flow-box worker">📝 Editor × N</div>
+          <div class="flow-box worker">🎨 Image × N+1</div>
+        </div>
+        <div class="flow-arrow down">↓ all workers complete → CrewState</div>
+        <div class="flow-row">
+          <div class="flow-box super">📎 Citation Manager</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-box super">🔗 Reducer / Assembler</div>
+        </div>
+        <div class="flow-arrow down">↓</div>
+        <div class="flow-row">
+          <div class="flow-box out">📄 Final .md + .html blog post with images &amp; citations</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="agent-grid">
+      <div class="agent-card">
+        <div class="agent-card-top"><div class="agent-icon" style="background:rgba(124,109,250,0.15);">🔀</div><div class="agent-name">Router</div></div>
+        <div class="agent-role">Entry point. Classifies topic, sets <code>research_required</code> flag. No tools — pure LLM reasoning.</div>
+        <span class="agent-file">agents/router.py</span>
+      </div>
+      <div class="agent-card">
+        <div class="agent-card-top"><div class="agent-icon" style="background:rgba(112,198,248,0.15);">📋</div><div class="agent-name">Planner</div></div>
+        <div class="agent-role">Generates structured <code>BlogPlan</code>. Determines parallelization strategy and spawns worker crews.</div>
+        <span class="agent-file">agents/planner.py</span>
+      </div>
+      <div class="agent-card">
+        <div class="agent-card-top"><div class="agent-icon" style="background:rgba(94,207,142,0.15);">🔍</div><div class="agent-name">Researcher × N</div></div>
+        <div class="agent-role">One per section. Executes SearxNG searches, fetches pages, extracts facts and source URLs.</div>
+        <span class="agent-file">agents/researcher.py</span>
+      </div>
+      <div class="agent-card">
+        <div class="agent-card-top"><div class="agent-icon" style="background:rgba(232,122,183,0.15);">✍️</div><div class="agent-name">Writer × N</div></div>
+        <div class="agent-role">One per section. Drafts Markdown with inline citation markers and image placeholder tokens.</div>
+        <span class="agent-file">agents/writer.py</span>
+      </div>
+      <div class="agent-card">
+        <div class="agent-card-top"><div class="agent-icon" style="background:rgba(244,168,54,0.15);">📝</div><div class="agent-name">Editor × N</div></div>
+        <div class="agent-role">Refines each writer draft. Improves clarity, SEO, tone. Runs in parallel after writers.</div>
+        <span class="agent-file">agents/editor.py</span>
+      </div>
+      <div class="agent-card">
+        <div class="agent-card-top"><div class="agent-icon" style="background:rgba(240,107,107,0.15);">🎨</div><div class="agent-name">Image Agent × N+1</div></div>
+        <div class="agent-role">Calls Stable Diffusion v1.4 via diffusers. Saves 512×512 images; returns file paths and alt text.</div>
+        <span class="agent-file">agents/image_agent.py</span>
+      </div>
+      <div class="agent-card">
+        <div class="agent-card-top"><div class="agent-icon" style="background:rgba(93,217,196,0.15);">📎</div><div class="agent-name">Citation Manager</div></div>
+        <div class="agent-role">Pure Python. Builds citation registry, deduplicates URLs, resolves <code>[citation]</code> markers.</div>
+        <span class="agent-file">agents/citation_manager.py</span>
+      </div>
+      <div class="agent-card">
+        <div class="agent-card-top"><div class="agent-icon" style="background:rgba(124,109,250,0.15);">🔗</div><div class="agent-name">Reducer</div></div>
+        <div class="agent-role">Assembles final blog. Orders sections, injects images and citations, writes .md + .html output files.</div>
+        <span class="agent-file">agents/reducer.py</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- SECTION 1: HIERARCHY -->
+  <section class="section" id="hierarchy">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <div>
+        <div class="section-title">File Hierarchy Map</div>
+        <div class="section-sub">Every file and folder — its role and what lives inside it</div>
+      </div>
+    </div>
+
+    <div class="filetree">
+<div class="tree-row"><span class="tree-indent">   </span><span class="tree-icon">📁</span><span class="tree-name folder">blog-writing-agent/</span><span class="tree-desc">project root</span></div>
+<div class="tree-row"><span class="tree-indent">   ├── </span><span class="tree-icon">📄</span><span class="tree-name config">.gitignore</span><span class="tree-desc">exclude outputs/, chroma_db/, __pycache__, .env</span></div>
+<div class="tree-row"><span class="tree-indent">   ├── </span><span class="tree-icon">📄</span><span class="tree-name">README.md</span><span class="tree-desc">setup instructions, architecture overview</span></div>
+<div class="tree-row"><span class="tree-indent">   ├── </span><span class="tree-icon">📄</span><span class="tree-name config">requirements.txt</span><span class="tree-desc">all pinned dependencies</span></div>
+<div class="tree-row"><span class="tree-indent">   ├── </span><span class="tree-icon">📄</span><span class="tree-name config">docker-compose.yml</span><span class="tree-desc">SearxNG service on port 8080</span></div>
+<div class="tree-row"><span class="tree-indent">   ├── </span><span class="tree-icon">📄</span><span class="tree-name config">config.py</span><span class="tree-desc">global constants: model names, ports, paths, hardware flags</span></div>
+<div class="tree-row"><span class="tree-indent">   ├── </span><span class="tree-icon">📄</span><span class="tree-name">schemas.py</span><span class="tree-desc">Pydantic models: Section, BlogPlan, ResearchResult, SectionDraft, ImageResult</span></div>
+<div class="tree-row"><span class="tree-indent">   ├── </span><span class="tree-icon">📄</span><span class="tree-name">state.py</span><span class="tree-desc">CrewState TypedDict — shared working memory for entire pipeline</span></div>
+<div class="tree-row"><span class="tree-indent">   ├── </span><span class="tree-icon">📄</span><span class="tree-name entry">graph.py</span><span class="tree-desc">orchestration entry point — compiles crew, calls dispatch_crews(), async gather</span></div>
+<div class="tree-row"><span class="tree-indent">   ├── </span><span class="tree-icon">📄</span><span class="tree-name entry">streamlit_app.py</span><span class="tree-desc">UI: topic input, progress bars, rendered blog preview, download buttons</span></div>
+<div class="tree-row"><span class="tree-indent">   │</span></div>
+<div class="tree-row"><span class="tree-indent">   ├── </span><span class="tree-icon">📁</span><span class="tree-name folder">agents/</span><span class="tree-desc">one file per agent, all import from schemas.py + state.py</span></div>
+<div class="tree-row"><span class="tree-indent">   │   ├── </span><span class="tree-icon">📄</span><span class="tree-name agent">router.py</span><span class="tree-desc">Router Node — LLM classification, returns research_required bool</span></div>
+<div class="tree-row"><span class="tree-indent">   │   ├── </span><span class="tree-icon">📄</span><span class="tree-name agent">planner.py</span><span class="tree-desc">Planner Node — structured BlogPlan output, dispatch_crews() factory</span></div>
+<div class="tree-row"><span class="tree-indent">   │   ├── </span><span class="tree-icon">📄</span><span class="tree-name agent">researcher.py</span><span class="tree-desc">Researcher Worker — SearxNG calls, page fetch, summarize, ResearchResult</span></div>
+<div class="tree-row"><span class="tree-indent">   │   ├── </span><span class="tree-icon">📄</span><span class="tree-name agent">writer.py</span><span class="tree-desc">Writer Worker — section draft with citation + image placeholder markers</span></div>
+<div class="tree-row"><span class="tree-indent">   │   ├── </span><span class="tree-icon">📄</span><span class="tree-name agent">editor.py</span><span class="tree-desc">Editor Worker — refinement pass: clarity, SEO, tone, word count check</span></div>
+<div class="tree-row"><span class="tree-indent">   │   ├── </span><span class="tree-icon">📄</span><span class="tree-name agent">image_agent.py</span><span class="tree-desc">Image Agent — SD v1.4 diffusers pipeline, GPU/CPU detection, save to outputs/images/</span></div>
+<div class="tree-row"><span class="tree-indent">   │   ├── </span><span class="tree-icon">📄</span><span class="tree-name agent">citation_manager.py</span><span class="tree-desc">Pure Python — URL dedup, citation registry dict, inline marker resolution</span></div>
+<div class="tree-row"><span class="tree-indent">   │   └── </span><span class="tree-icon">📄</span><span class="tree-name agent">reducer.py</span><span class="tree-desc">Assembler — section ordering, image injection, final .md + .html write</span></div>
+<div class="tree-row"><span class="tree-indent">   │</span></div>
+<div class="tree-row"><span class="tree-indent">   ├── </span><span class="tree-icon">📁</span><span class="tree-name folder">prompts/</span><span class="tree-desc">plain-text prompt templates; loaded at runtime to stay editable</span></div>
+<div class="tree-row"><span class="tree-indent">   │   ├── </span><span class="tree-icon">📄</span><span class="tree-name prompt">router_prompt.txt</span><span class="tree-desc">classification instructions + decision logic</span></div>
+<div class="tree-row"><span class="tree-indent">   │   ├── </span><span class="tree-icon">📄</span><span class="tree-name prompt">planner_prompt.txt</span><span class="tree-desc">outline + query generation instructions</span></div>
+<div class="tree-row"><span class="tree-indent">   │   ├── </span><span class="tree-icon">📄</span><span class="tree-name prompt">researcher_prompt.txt</span><span class="tree-desc">search synthesis + fact extraction instructions</span></div>
+<div class="tree-row"><span class="tree-indent">   │   ├── </span><span class="tree-icon">📄</span><span class="tree-name prompt">writer_prompt.txt</span><span class="tree-desc">section writing + citation/image marker rules</span></div>
+<div class="tree-row"><span class="tree-indent">   │   ├── </span><span class="tree-icon">📄</span><span class="tree-name prompt">editor_prompt.txt</span><span class="tree-desc">style guide, SEO rules, word count enforcement</span></div>
+<div class="tree-row"><span class="tree-indent">   │   └── </span><span class="tree-icon">📄</span><span class="tree-name prompt">image_prompt.txt</span><span class="tree-desc">SD prompt engineering template</span></div>
+<div class="tree-row"><span class="tree-indent">   │</span></div>
+<div class="tree-row"><span class="tree-indent">   ├── </span><span class="tree-icon">📁</span><span class="tree-name folder">tools/</span><span class="tree-desc">reusable wrappers for external services</span></div>
+<div class="tree-row"><span class="tree-indent">   │   ├── </span><span class="tree-icon">📄</span><span class="tree-name tool">search.py</span><span class="tree-desc">SearxSearchWrapper + DuckDuckGo fallback + 24h JSON cache layer</span></div>
+<div class="tree-row"><span class="tree-indent">   │   └── </span><span class="tree-icon">📄</span><span class="tree-name tool">image_gen.py</span><span class="tree-desc">SD v1.4 pipeline factory, GPU/CPU auto-detect, step/res tuning</span></div>
+<div class="tree-row"><span class="tree-indent">   │</span></div>
+<div class="tree-row"><span class="tree-indent">   └── </span><span class="tree-icon">📁</span><span class="tree-name folder">outputs/</span><span class="tree-desc">runtime-generated (gitignored)</span></div>
+<div class="tree-row"><span class="tree-indent">       ├── </span><span class="tree-icon">📁</span><span class="tree-name output">blogs/</span><span class="tree-desc">final .md and .html files per run</span></div>
+<div class="tree-row"><span class="tree-indent">       └── </span><span class="tree-icon">📁</span><span class="tree-name output">images/</span><span class="tree-desc">generated PNG images — feature + section images</span></div>
+    </div>
+
+    <div class="file-cards">
+      <div class="file-card">
+        <div class="file-card-header"><div class="file-card-name config">config.py</div></div>
+        <p>Single source of truth for all tunables. Import constants here — never hardcode values in agents.</p>
+        <ul>
+          <li>Ollama base URL, model name (<code>mistral:7b</code>)</li>
+          <li>SearxNG host (<code>http://localhost:8080</code>)</li>
+          <li>SD model ID, GPU flag, step/resolution defaults</li>
+          <li>Output directories, cache TTL (86400s)</li>
+        </ul>
+      </div>
+      <div class="file-card">
+        <div class="file-card-header"><div class="file-card-name">schemas.py</div></div>
+        <p>All Pydantic models used as inter-agent contracts. Changing a schema here propagates everywhere.</p>
+        <ul>
+          <li><code>Section</code>, <code>BlogPlan</code> — planner output</li>
+          <li><code>ResearchResult</code> — researcher output</li>
+          <li><code>SectionDraft</code> — writer/editor output</li>
+          <li><code>ImageResult</code> — image agent output</li>
+        </ul>
+      </div>
+      <div class="file-card">
+        <div class="file-card-header"><div class="file-card-name">state.py</div></div>
+        <p>Defines <code>CrewState</code> TypedDict. This is the sole object that flows through the entire pipeline — every agent reads from and writes to it.</p>
+        <ul>
+          <li>Input: <code>topic: str</code></li>
+          <li>Router: <code>research_required: bool</code></li>
+          <li>Workers: <code>research_results</code>, <code>completed_sections</code>, <code>generated_images</code></li>
+          <li>Reducer: <code>final_markdown</code>, <code>final_html</code>, <code>output_path</code></li>
+        </ul>
+      </div>
+      <div class="file-card">
+        <div class="file-card-header"><div class="file-card-name entry">graph.py</div></div>
+        <p>Orchestration entry point. Chains the supervisor layer sequentially, then uses <code>asyncio.gather</code> to fire all worker crews in parallel, then runs Citation Manager → Reducer.</p>
+        <ul>
+          <li>Imports and calls all 8 agent functions</li>
+          <li>Manages <code>CrewState</code> lifecycle</li>
+          <li>Wraps each worker in try/except with 3-tier fallback</li>
+          <li>SQLite checkpoint after each tier</li>
+        </ul>
+      </div>
+      <div class="file-card">
+        <div class="file-card-header"><div class="file-card-name entry">streamlit_app.py</div></div>
+        <p>UI layer. Calls <code>graph.py</code> with the entered topic, streams progress, and renders the final blog preview with download links.</p>
+        <ul>
+          <li>Topic text input + submit button</li>
+          <li>Per-agent progress status display</li>
+          <li>Rendered Markdown blog preview</li>
+          <li>Download buttons for .md and .html</li>
+        </ul>
+      </div>
+      <div class="file-card">
+        <div class="file-card-header"><div class="file-card-name tool">tools/search.py</div></div>
+        <p>Wraps SearxNG + DuckDuckGo with a 24-hour disk-based JSON cache keyed by query hash. If cached, bypasses the network entirely.</p>
+        <ul>
+          <li><code>search(query)</code> → list of result dicts</li>
+          <li>Auto-fallback to DuckDuckGo on SearxNG failure</li>
+          <li>Cache stored in <code>.cache/</code> per query hash</li>
+        </ul>
+      </div>
+      <div class="file-card">
+        <div class="file-card-header"><div class="file-card-name tool">tools/image_gen.py</div></div>
+        <p>Stable Diffusion v1.4 pipeline wrapper. Detects CUDA availability at import time and sets appropriate resolution and step count.</p>
+        <ul>
+          <li>GPU: 512×512, 50 steps, <code>torch.float16</code></li>
+          <li>CPU: 384×384, 15 steps, <code>torch.float32</code></li>
+          <li>Runs in <code>ThreadPoolExecutor</code> to stay off main event loop</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- PHASE 1 -->
+  <section class="section" id="phase1">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <div>
+        <div class="section-title">Phase 1 — Environment Setup</div>
+        <div class="section-sub">Install every dependency before writing a single line of project code</div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-badge p1">Phase 1</span>
+        <span class="phase-title">Environment &amp; Core Dependencies</span>
+        <span class="phase-time">~2–4 hours</span>
+      </div>
+      <div class="phase-body">
+        <div class="steps">
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p1">1</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Install Ollama and pull Mistral 7B</div>
+              <div class="step-desc">Download Ollama from <code>ollama.ai</code> and install it for your OS. Then pull the model. Verify with <code>ollama list</code>.</div>
+              <div class="step-code">ollama pull mistral:7b
+ollama serve          # starts API on port 11434
+curl http://localhost:11434/api/tags</div>
+              <div class="step-tags"><span class="step-tag">LLM backend</span><span class="step-tag">port 11434</span></div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p1">2</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Spin up SearxNG via Docker</div>
+              <div class="step-desc">Requires Docker Desktop installed. The container exposes a meta-search endpoint on port 8080. No API key needed.</div>
+              <div class="step-code">docker run -d -p 8080:8080 --name searxng searxng/searxng
+# Verify at http://localhost:8080</div>
+              <div class="step-tags"><span class="step-tag">search layer</span><span class="step-tag">port 8080</span><span class="step-tag">Docker required</span></div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p1">3</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Create Python virtual environment</div>
+              <div class="step-desc">Use Python 3.10+ (3.11 recommended for best CrewAI compatibility). Activate before all subsequent steps.</div>
+              <div class="step-code">python -m venv bwa_env
+source bwa_env/bin/activate     # macOS/Linux
+bwa_env\Scripts\activate        # Windows</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p1">4</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Install Python dependencies</div>
+              <div class="step-desc">Create <code>requirements.txt</code> first (see Phase 2), then install. The <code>diffusers</code> + <code>torch</code> download can be ~3–5 GB — do this on a good connection.</div>
+              <div class="step-code">pip install crewai langchain langchain-community
+pip install pydantic streamlit chromadb
+pip install diffusers torch transformers accelerate
+pip install markdown requests beautifulsoup4</div>
+              <div class="step-tags"><span class="step-tag">CrewAI</span><span class="step-tag">LangChain</span><span class="step-tag">diffusers</span><span class="step-tag">~3–5 GB download</span></div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p1">5</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Pre-download Stable Diffusion v1.4 weights</div>
+              <div class="step-desc">This caches the model to <code>~/.cache/huggingface/</code>. Must happen before first run — cannot be done lazily at runtime without hanging the UI.</div>
+              <div class="step-code">python -c "
+from diffusers import StableDiffusionPipeline
+pipe = StableDiffusionPipeline.from_pretrained('CompVis/stable-diffusion-v1-4')
+print('SD weights cached successfully')
+"</div>
+              <div class="step-tags"><span class="step-tag">~4 GB model download</span><span class="step-tag">HuggingFace cache</span></div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p1">6</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Smoke-test the entire stack</div>
+              <div class="step-desc">Run the minimal single-file demo from Section 9 of the spec. If it outputs a draft blog post, all three core services (Ollama, SearxNG, CrewAI) are wired correctly.</div>
+              <div class="step-code">python -c "
+from langchain_community.chat_models import ChatOllama
+llm = ChatOllama(model='mistral', temperature=0.3)
+print(llm.invoke('Say hello').content)
+"</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <strong>Hardware note:</strong> If you have no CUDA GPU, set <code>USE_GPU = False</code> in <code>config.py</code>. Image generation will fall back to 15 steps at 384×384 — much slower (~5 min per image on CPU) but functional. For the initial build, consider disabling image generation entirely until the text pipeline is stable.
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- PHASE 2 -->
+  <section class="section" id="phase2">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <div>
+        <div class="section-title">Phase 2 — Foundation</div>
+        <div class="section-sub">Build the skeleton before filling in agent logic</div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-badge p2">Phase 2</span>
+        <span class="phase-title">Directory Structure &amp; Core Contracts</span>
+        <span class="phase-time">~2–3 hours</span>
+      </div>
+      <div class="phase-body">
+        <div class="steps">
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p2">1</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Scaffold the directory structure</div>
+              <div class="step-desc">Create every folder and every empty file first. This lets you wire imports and test the module graph before any logic exists.</div>
+              <div class="step-code">mkdir -p blog-writing-agent/{agents,prompts,tools,outputs/{blogs,images},.cache}
+cd blog-writing-agent
+touch config.py schemas.py state.py graph.py streamlit_app.py
+touch agents/{router,planner,researcher,writer,editor,image_agent,citation_manager,reducer}.py
+touch prompts/{router,planner,researcher,writer,editor,image}_prompt.txt
+touch tools/{search,image_gen}.py</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p2">2</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Write config.py first</div>
+              <div class="step-desc">Every other file imports from here. Centralise all tunables so you never hardcode a value in an agent file.</div>
+              <div class="step-code"># config.py — key constants
+OLLAMA_BASE_URL = "http://localhost:11434"
+OLLAMA_MODEL    = "mistral:7b"
+SEARXNG_HOST    = "http://localhost:8080"
+SD_MODEL_ID     = "CompVis/stable-diffusion-v1-4"
+USE_GPU         = True          # set False for CPU-only
+IMG_SIZE        = (512, 512)    # GPU; (384,384) on CPU
+IMG_STEPS       = 50            # GPU; 15 on CPU
+CACHE_TTL_SEC   = 86400
+OUTPUT_BLOGS    = "outputs/blogs"
+OUTPUT_IMAGES   = "outputs/images"</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p2">3</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Define all Pydantic schemas in schemas.py</div>
+              <div class="step-desc">These are the inter-agent contracts. Write them all before any agent logic — they enforce the data shapes that every agent must produce and consume.</div>
+              <div class="schema-block"><span class="schema-kw">from</span> pydantic <span class="schema-kw">import</span> BaseModel
+<span class="schema-kw">from</span> typing <span class="schema-kw">import</span> List, Dict, Optional, Tuple
+<span class="schema-kw">from</span> datetime <span class="schema-kw">import</span> datetime
+
+<span class="schema-kw">class</span> <span class="schema-cls">Section</span>(BaseModel):
+    id: <span class="schema-type">str</span>
+    title: <span class="schema-type">str</span>
+    description: <span class="schema-type">str</span>
+    word_count: <span class="schema-type">int</span>
+    search_query: Optional[<span class="schema-type">str</span>]
+    image_prompt: <span class="schema-type">str</span>
+
+<span class="schema-kw">class</span> <span class="schema-cls">BlogPlan</span>(BaseModel):
+    blog_title: <span class="schema-type">str</span>
+    feature_image_prompt: <span class="schema-type">str</span>
+    sections: List[<span class="schema-cls">Section</span>]
+    research_required: <span class="schema-type">bool</span>
+
+<span class="schema-kw">class</span> <span class="schema-cls">ResearchResult</span>(BaseModel):
+    section_id: <span class="schema-type">str</span>
+    summary: <span class="schema-type">str</span>
+    sources: List[Dict[<span class="schema-type">str</span>, <span class="schema-type">str</span>]]
+    timestamp: datetime
+
+<span class="schema-kw">class</span> <span class="schema-cls">SectionDraft</span>(BaseModel):
+    section_id: <span class="schema-type">str</span>
+    title: <span class="schema-type">str</span>
+    content: <span class="schema-type">str</span>  <span class="schema-cmt"># Markdown with [citation] and [IMAGE_PLACEHOLDER_{id}]</span>
+    word_count: <span class="schema-type">int</span>
+    citations: List[<span class="schema-type">str</span>]
+
+<span class="schema-kw">class</span> <span class="schema-cls">ImageResult</span>(BaseModel):
+    section_id: <span class="schema-type">str</span>
+    prompt: <span class="schema-type">str</span>
+    file_path: <span class="schema-type">str</span>
+    alt_text: <span class="schema-type">str</span>
+    size: Tuple[<span class="schema-type">int</span>, <span class="schema-type">int</span>]</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p2">4</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Define CrewState in state.py</div>
+              <div class="step-desc">The single shared TypedDict that flows through the entire pipeline. Every agent receives this as input and returns a partial update dict.</div>
+              <div class="schema-block"><span class="schema-kw">from</span> typing <span class="schema-kw">import</span> TypedDict, List, Optional
+<span class="schema-kw">from</span> schemas <span class="schema-kw">import</span> BlogPlan, ResearchResult, SectionDraft, ImageResult
+
+<span class="schema-kw">class</span> <span class="schema-cls">CrewState</span>(TypedDict):
+    topic: <span class="schema-type">str</span>
+    research_required: <span class="schema-type">bool</span>
+    plan: Optional[<span class="schema-cls">BlogPlan</span>]
+    research_results: List[<span class="schema-cls">ResearchResult</span>]
+    completed_sections: List[<span class="schema-cls">SectionDraft</span>]
+    generated_images: List[<span class="schema-cls">ImageResult</span>]
+    citation_registry: dict
+    final_markdown: <span class="schema-type">str</span>
+    final_html: <span class="schema-type">str</span>
+    output_path: <span class="schema-type">str</span></div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p2">5</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Write the prompt .txt files</div>
+              <div class="step-desc">Populate each prompt template with detailed instructions. Storing them as text files means you can tune prompts without touching Python code. Keep prompts in second person ("You are a...") and include explicit output format instructions. The planner prompt is the most critical — write it last after you've tested the other agents.</div>
+              <div class="step-tags"><span class="step-tag">router_prompt.txt</span><span class="step-tag">planner_prompt.txt</span><span class="step-tag">writer_prompt.txt</span><span class="step-tag">editor_prompt.txt</span></div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p2">6</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Write the .gitignore and docker-compose.yml</div>
+              <div class="step-desc">Ignore generated outputs, model caches, and Python artifacts. The docker-compose file only needs the SearxNG service for now.</div>
+              <div class="step-code"># docker-compose.yml
+version: "3"
+services:
+  searxng:
+    image: searxng/searxng
+    ports: ["8080:8080"]
+    restart: unless-stopped</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- PHASE 3 -->
+  <section class="section" id="phase3">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <div>
+        <div class="section-title">Phase 3 — Agent Logic Implementation</div>
+        <div class="section-sub">Implement files in dependency order — tools first, then agents, then orchestrator</div>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <strong>Implementation order matters.</strong> Build in this sequence: <code>tools/</code> → <code>agents/citation_manager.py</code> → <code>agents/reducer.py</code> → <code>agents/router.py</code> → <code>agents/planner.py</code> → <code>agents/researcher.py</code> → <code>agents/writer.py</code> → <code>agents/editor.py</code> → <code>agents/image_agent.py</code> → <code>graph.py</code> → <code>streamlit_app.py</code>. Start with the nodes that have no dependencies and build upward.
+    </div>
+
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-badge p3">Step 1</span>
+        <span class="phase-title">tools/search.py — Search wrapper with caching</span>
+      </div>
+      <div class="phase-body">
+        <div class="steps">
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Cache layer first</div>
+              <div class="step-desc">Implement a <code>cache_get(query)</code> / <code>cache_set(query, results)</code> pair that stores JSON in <code>.cache/{hash}.json</code> with a TTL check. This prevents redundant network calls during development.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">SearxNG integration</div>
+              <div class="step-desc">Use <code>langchain_community.utilities.SearxSearchWrapper(searx_host=SEARXNG_HOST)</code>. Wrap in try/except — on any failure, fall through to the DuckDuckGo fallback. Return a list of <code>{"url": str, "title": str, "snippet": str}</code> dicts.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">DuckDuckGo fallback</div>
+              <div class="step-desc">Import <code>DuckDuckGoSearchRun</code> from <code>langchain_community.tools</code>. If SearxNG raises, call DuckDuckGo with the same query. Normalise the output to the same dict shape.</div>
+              <div class="step-tags"><span class="step-tag">zero dependencies</span><span class="step-tag">implement + test first</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-badge p3">Step 2</span>
+        <span class="phase-title">tools/image_gen.py — Stable Diffusion pipeline</span>
+      </div>
+      <div class="phase-body">
+        <div class="steps">
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">GPU/CPU detection at module load time</div>
+              <div class="step-desc">Check <code>torch.cuda.is_available()</code> once at import. Set <code>dtype</code>, <code>device</code>, image size, and step count accordingly. Load the pipeline onto the device immediately — don't defer to the first call.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">generate_image(prompt, section_id) → str</div>
+              <div class="step-desc">Run the SD pipeline, save the image to <code>outputs/images/{section_id}.png</code> using a deterministic filename, and return the file path. This function will be called inside a <code>ThreadPoolExecutor</code> from the orchestrator.</div>
+              <div class="step-tags"><span class="step-tag">ThreadPoolExecutor</span><span class="step-tag">deterministic filenames</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-badge p3">Step 3</span>
+        <span class="phase-title">agents/citation_manager.py — Pure Python, no LLM</span>
+      </div>
+      <div class="phase-body">
+        <div class="steps">
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Build the citation registry</div>
+              <div class="step-desc">Aggregate all <code>ResearchResult.sources</code> from <code>CrewState.research_results</code>. Deduplicate by URL. Assign sequential numbers: <code>{1: {url, title, snippet}, 2: ...}</code>.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Resolve inline markers</div>
+              <div class="step-desc">Use regex to find <code>[citation]</code> markers in each section draft's content. Replace with <code>[N]</code> where N maps to the registry. Also append a formatted "References" section at the end. Return updated <code>completed_sections</code> and the <code>citation_registry</code>.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-badge p3">Step 4</span>
+        <span class="phase-title">agents/reducer.py — Final assembler</span>
+      </div>
+      <div class="phase-body">
+        <div class="steps">
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Order sections by plan index</div>
+              <div class="step-desc">Sort <code>completed_sections</code> by matching <code>section_id</code> to the order in <code>plan.sections</code>. Never assume they arrive in order from parallel workers.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Substitute image placeholder tokens</div>
+              <div class="step-desc">For each <code>[IMAGE_PLACEHOLDER_{id}]</code> token in a section's content, look up the matching <code>ImageResult</code> and replace with <code>![alt_text](file_path)</code>. If no image exists for that ID, replace with an empty paragraph.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div></div>
+            <div class="step-content">
+              <div class="step-name">Write .md and .html output files</div>
+              <div class="step-desc">Assemble the full Markdown string: metadata block → feature image → sections → references. Write to <code>outputs/blogs/{slug}.md</code>. Convert to HTML using the <code>markdown</code> library and write <code>.html</code>. Store both paths in <code>CrewState</code>.</div>
+              <div class="step-tags"><span class="step-tag">implement before router</span><span class="step-tag">testable independently</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-badge p3">Step 5</span>
+        <span class="phase-title">agents/router.py — Intent classifier</span>
+      </div>
+      <div class="phase-body">
+        <div class="steps">
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Load prompt and build LLM chain</div>
+              <div class="step-desc">Read <code>prompts/router_prompt.txt</code>. Create a <code>ChatOllama</code> instance with <code>temperature=0</code> (deterministic for classification). Format as a <code>ChatPromptTemplate</code> with <code>{topic}</code> as the only variable.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div></div>
+            <div class="step-content">
+              <div class="step-name">router_node(state) → dict</div>
+              <div class="step-desc">Invoke the chain. Parse the response for a <code>true</code>/<code>false</code> classification. Return <code>{"research_required": bool}</code>. Wrap in try/except — on failure, default to <code>True</code> (safe fallback: always research).</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-badge p3">Step 6</span>
+        <span class="phase-title">agents/planner.py — BlogPlan generator</span>
+      </div>
+      <div class="phase-body">
+        <div class="steps">
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Structured output via Pydantic</div>
+              <div class="step-desc">Use <code>llm.with_structured_output(BlogPlan)</code> from LangChain to enforce the exact <code>BlogPlan</code> schema. This forces Mistral to output valid JSON that maps to the model. Retry up to 3 times if parsing fails.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">dispatch_crews() factory</div>
+              <div class="step-desc">Implement the crew factory function that, given a <code>BlogPlan</code>, creates one CrewAI <code>Crew</code> per section for each worker type (Researcher, Writer, Editor, Image). Returns a flat list of crews to be gathered by the orchestrator. This is the key parallelism function.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div></div>
+            <div class="step-content">
+              <div class="step-name">ChromaDB RAG query (optional Phase 2 feature)</div>
+              <div class="step-desc">Before generating a new plan, query the ChromaDB "blog_research" collection with <code>similarity_search(topic, k=3)</code>. If relevant past research exists, inject it into the planner prompt as additional context. This is an enhancement — wire up core logic first.</div>
+              <div class="step-tags"><span class="step-tag">most complex agent</span><span class="step-tag">implement last in this group</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-badge p3">Step 7</span>
+        <span class="phase-title">agents/researcher.py — Web research worker</span>
+      </div>
+      <div class="phase-body">
+        <div class="steps">
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">researcher_node(section) → ResearchResult</div>
+              <div class="step-desc">Takes a single <code>Section</code> object. Call <code>tools.search.search(section.search_query)</code> 2–3 times with slightly varied queries. Pass top results + snippets to Mistral for summarization into 300–500 words. Return a <code>ResearchResult</code>.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div></div>
+            <div class="step-content">
+              <div class="step-name">3-tier fallback</div>
+              <div class="step-desc">Tier 1: retry 3× with exponential backoff (1s, 2s, 4s). Tier 2: on total failure, return an empty <code>ResearchResult</code> with <code>summary="[RESEARCH_FAILED]"</code> and empty sources. The Writer will handle this gracefully.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-badge p3">Step 8</span>
+        <span class="phase-title">agents/writer.py + agents/editor.py</span>
+      </div>
+      <div class="phase-body">
+        <div class="steps">
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">writer_node(section, research) → SectionDraft</div>
+              <div class="step-desc">Load <code>writer_prompt.txt</code>. Inject: section description, target word count, research summary, source URLs. Invoke Mistral. Parse the Markdown response. Count words. Insert <code>[IMAGE_PLACEHOLDER_{section.id}]</code> after the first paragraph. Return a <code>SectionDraft</code>.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div></div>
+            <div class="step-content">
+              <div class="step-name">editor_node(draft) → SectionDraft</div>
+              <div class="step-desc">Load <code>editor_prompt.txt</code>. Pass the full draft content. Ask Mistral to improve clarity, SEO density, flow, and enforce word count. Return an updated <code>SectionDraft</code> with the same <code>section_id</code>. The editor must preserve all <code>[IMAGE_PLACEHOLDER_...]</code> and <code>[citation]</code> tokens.</div>
+              <div class="step-tags"><span class="step-tag">both are parallel per section</span><span class="step-tag">editor waits on writer output</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-badge p3">Step 9</span>
+        <span class="phase-title">agents/image_agent.py — Visual content creator</span>
+      </div>
+      <div class="phase-body">
+        <div class="steps">
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div></div>
+            <div class="step-content">
+              <div class="step-name">image_agent_node(section) → ImageResult</div>
+              <div class="step-desc">Call <code>tools.image_gen.generate_image(section.image_prompt, section.id)</code> in a <code>ThreadPoolExecutor</code> (keeps image generation off the async event loop). On failure, return an <code>ImageResult</code> with <code>file_path="PLACEHOLDER"</code> — the Reducer handles this gracefully by emitting plain text instead of an image tag.</div>
+              <div class="step-tags"><span class="step-tag">Tier 3 skip-and-continue fallback</span><span class="step-tag">most latency-sensitive</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-badge p3">Step 10</span>
+        <span class="phase-title">graph.py — Orchestration pipeline</span>
+      </div>
+      <div class="phase-body">
+        <div class="steps">
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Sequential supervisor layer</div>
+              <div class="step-desc">Chain <code>router_node</code> → <code>planner_node</code> sequentially. After each, update the <code>CrewState</code> dict with the returned fields.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Parallel worker dispatch via asyncio.gather</div>
+              <div class="step-desc">Build coroutines for every Researcher, Writer, Editor, and Image crew. Call <code>await asyncio.gather(*coroutines)</code>. Merge the results back into <code>CrewState.research_results</code>, <code>.completed_sections</code>, and <code>.generated_images</code> lists.</div>
+              <div class="step-code">crews = dispatch_crews(state)
+results = await asyncio.gather(*[c.kickoff_async() for c in crews])
+# merge results into state</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div></div>
+            <div class="step-content">
+              <div class="step-name">Sequential termination layer</div>
+              <div class="step-desc">After gather completes, run <code>citation_manager_node</code> → <code>reducer_node</code> sequentially. Save SQLite checkpoint after each stage. Return final <code>CrewState</code>.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-badge p3">Step 11</span>
+        <span class="phase-title">streamlit_app.py — UI layer</span>
+      </div>
+      <div class="phase-body">
+        <div class="steps">
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Topic input form</div>
+              <div class="step-desc">Use <code>st.text_input</code> for the topic. A "Generate" button triggers the pipeline. Wrap the <code>graph.py</code> call in <code>asyncio.run()</code> since Streamlit is synchronous.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Progress display</div>
+              <div class="step-desc">Use <code>st.status</code> containers to show each agent phase: Routing → Planning → Researching (N sections) → Writing → Editing → Generating images → Assembling. Update these from a progress callback passed into <code>graph.py</code>.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-left"><div class="step-dot p3">›</div></div>
+            <div class="step-content">
+              <div class="step-name">Output preview + download</div>
+              <div class="step-desc">Use <code>st.markdown</code> to render the final blog inline. Provide <code>st.download_button</code> for both <code>.md</code> and <code>.html</code> outputs. Display generated images using <code>st.image</code> with the paths from <code>CrewState.generated_images</code>.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- PHASE 4 -->
+  <section class="section" id="phase4">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <div>
+        <div class="section-title">Phase 4 — Testing &amp; Deployment</div>
+        <div class="section-sub">Validate each layer in isolation before integration testing the full pipeline</div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-badge p4">Test strategy</span>
+        <span class="phase-title">Unit → Integration → End-to-End</span>
+        <span class="phase-time">~1 week</span>
+      </div>
+      <div class="phase-body">
+        <div class="steps">
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p4">T1</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Unit test each agent in isolation</div>
+              <div class="step-desc">For each agent, construct a minimal <code>CrewState</code> with just the fields that agent reads, call the node function, and assert the returned dict has the expected schema. Mock Ollama and SearxNG for speed.</div>
+              <div class="step-code">from agents.router import router_node
+state = {"topic": "latest AI research 2025", "research_required": False}
+result = router_node(state)
+assert "research_required" in result
+assert isinstance(result["research_required"], bool)</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p4">T2</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Test tools independently</div>
+              <div class="step-desc">Run <code>tools/search.py</code> with a real query against your running SearxNG Docker container. Verify the JSON cache file is written. Run again — verify it's served from cache (no network call). Test the DuckDuckGo fallback by stopping the SearxNG container.</div>
+              <div class="step-tags"><span class="step-tag">requires running SearxNG</span><span class="step-tag">requires running Ollama</span></div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p4">T3</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Integration test: Researcher → Writer → Editor chain</div>
+              <div class="step-desc">Create one <code>Section</code> object, pass it through Researcher, then Writer, then Editor in sequence. Assert that the final <code>SectionDraft</code> contains an <code>[IMAGE_PLACEHOLDER_...]</code> token, has a non-zero word count, and citations list is populated.</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p4">T4</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Integration test: Citation Manager → Reducer</div>
+              <div class="step-desc">Construct a mock <code>CrewState</code> with 2–3 fake <code>SectionDraft</code> objects and <code>ResearchResult</code> objects. Run Citation Manager and assert the registry is built. Pass to Reducer and assert the output .md file is written to disk with correct image and citation syntax.</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p4">T5</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Full end-to-end pipeline test (no images)</div>
+              <div class="step-desc">Call <code>graph.py</code> directly with a simple, well-known topic (e.g., "What is machine learning"). Disable image generation (<code>SKIP_IMAGES=True</code> flag in config). Measure total wall time. Target: under 3 minutes for 4 sections. Check the output .md file for: all sections present, no orphaned <code>[citation]</code> markers, references section appended.</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p4">T6</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Full end-to-end test with images</div>
+              <div class="step-desc">Re-enable image generation. Run the pipeline on a time-sensitive topic (e.g., "AI trends 2025") to exercise the <code>research_required=True</code> path. Verify: feature image + 4 section images generated, all placeholder tokens resolved in the HTML output, all citation URLs are real and accessible.</div>
+              <div class="step-tags"><span class="step-tag">target: under 6 min on RTX 3060</span><span class="step-tag">success metric from spec</span></div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p4">T7</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Test 3-tier fallback behaviour</div>
+              <div class="step-desc">Stop SearxNG. Run the pipeline — verify DuckDuckGo fallback fires. Stop Ollama mid-run — verify retry logic triggers. Use a malformed topic string — verify Router handles it gracefully without crashing the pipeline.</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p4">T8</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Streamlit UI acceptance test</div>
+              <div class="step-desc">Run <code>streamlit run streamlit_app.py</code>. Enter a topic, click Generate, and verify: progress indicators update per phase, blog renders correctly in the preview pane, both .md and .html download buttons work, images display inline.</div>
+              <div class="step-code">streamlit run streamlit_app.py --server.port 8501</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-badge p4">Deployment</span>
+        <span class="phase-title">Local containerisation &amp; optional production path</span>
+      </div>
+      <div class="phase-body">
+        <div class="steps">
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p4">D1</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Add ChromaDB long-term memory (Phase 3 spec feature)</div>
+              <div class="step-desc">Create the "blog_research" ChromaDB collection in <code>planner.py</code>. After each successful run, save all <code>ResearchResult</code> summaries as documents with topic/section/URL metadata. Add the similarity_search query at the start of each Planner invocation.</div>
+              <div class="step-tags"><span class="step-tag">in-process, no server needed</span><span class="step-tag">persists to ./chroma_db/</span></div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p4">D2</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Docker-compose for the full stack</div>
+              <div class="step-desc">Extend <code>docker-compose.yml</code> to add the Streamlit service alongside SearxNG. Mount the <code>outputs/</code> and <code>chroma_db/</code> volumes. Expose port 8501 for the UI.</div>
+              <div class="step-code">services:
+  searxng:
+    image: searxng/searxng
+    ports: ["8080:8080"]
+  blogagent:
+    build: .
+    ports: ["8501:8501"]
+    volumes: ["./outputs:/app/outputs", "./chroma_db:/app/chroma_db"]
+    depends_on: [searxng]</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p4">D3</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">LangSmith tracing (optional observability)</div>
+              <div class="step-desc">Set <code>LANGCHAIN_TRACING_V2=true</code> and your LangSmith API key in a <code>.env</code> file. Every LLM call from CrewAI will be traced automatically. Use the LangSmith dashboard to identify slow agents, poor prompt performance, and hallucinated citations.</div>
+              <div class="step-tags"><span class="step-tag">optional</span><span class="step-tag">free tier available</span></div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p4">D4</div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-name">Performance profiling + optimization</div>
+              <div class="step-desc">Profile the pipeline with <code>cProfile</code> or LangSmith traces. Common bottlenecks: image generation (move to background thread), sequential SearxNG page fetches (batch with <code>asyncio.gather</code>), Mistral cold-start (keep Ollama warm between runs with a keep-alive ping).</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left"><div class="step-dot p4">D5</div></div>
+            <div class="step-content">
+              <div class="step-name">Future extensions (out of scope for v1)</div>
+              <div class="step-desc">Once the core pipeline is stable, the spec identifies these Phase 5 additions: WordPress/Ghost publishing integration, human-in-the-loop editing UI, multi-topic batch processing via a queue, and multilingual support. Each can be added as an optional post-Reducer step without changing any agent logic.</div>
+              <div class="step-tags"><span class="step-tag">WordPress API</span><span class="step-tag">Ghost CMS</span><span class="step-tag">multilingual</span><span class="step-tag">batch queue</span></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- FINAL CHECKLIST -->
+    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-top: 32px;">
+      <div style="font-weight: 600; font-size: 15px; color: var(--text); margin-bottom: 20px; display:flex;align-items:center;gap:10px;">
+        <span style="color:var(--accent2)">✓</span> Definition of Done — v1 Release Checklist
+      </div>
+      <ul class="checklist">
+        <li><div class="check-icon"></div><div class="check-label"><strong>End-to-end run completes in under 6 minutes</strong> on RTX 3060 for a 4-section blog post.</div></li>
+        <li><div class="check-icon"></div><div class="check-label"><strong>At least 5 images generated per post</strong> — 1 feature image + 1 per section — and all placeholder tokens resolved in output.</div></li>
+        <li><div class="check-icon"></div><div class="check-label"><strong>Zero hallucinated citations</strong> — every reference URL is a real URL extracted from SearxNG/DuckDuckGo results.</div></li>
+        <li><div class="check-icon"></div><div class="check-label"><strong>3-tier fallback verified</strong> — pipeline completes even when SearxNG is down and when image generation fails.</div></li>
+        <li><div class="check-icon"></div><div class="check-label"><strong>Streamlit UI tested end-to-end</strong> — progress updates, blog preview renders, both download buttons work.</div></li>
+        <li><div class="check-icon"></div><div class="check-label"><strong>SQLite checkpoint tested</strong> — kill the process mid-run, restart, verify it resumes from the last completed agent tier.</div></li>
+        <li><div class="check-icon"></div><div class="check-label"><strong>Research cache verified</strong> — run the same topic twice, confirm second run skips network calls (under 60s total).</div></li>
+        <li><div class="check-icon"></div><div class="check-label"><strong>All outputs are gitignored</strong> — <code>outputs/</code>, <code>chroma_db/</code>, <code>.cache/</code>, <code>__pycache__/</code> absent from git status.</div></li>
+      </ul>
+    </div>
+
+  </section>
+
+</div>
+</body>
+</html>
