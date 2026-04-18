@@ -1,8 +1,19 @@
-# Python
+# Runtime-generated outputs (gitignored per roadmap Phase 2)
+outputs/
+outputs/blogs/
+outputs/images/
+
+# Vector database & long-term memory
+chroma_db/
+
+# Search & research cache
+.cache/
+
+# Python artifacts
 __pycache__/
-*.py[cod]
-*.class
-*.so
+*.pyc
+*.pyo
+*.pyd
 .Python
 build/
 develop-eggs/
@@ -20,22 +31,24 @@ wheels/
 .installed.cfg
 *.egg
 
-# Virtual Environment
+# Virtual environments
+.venv
 venv/
-env/
 ENV/
+env/
+.env
 
-# IDE
+# Hugging Face model cache (diffusers / Stable Diffusion)
+.huggingface/
+hf_cache/
+
+# OS & IDE files
+.DS_Store
+Thumbs.db
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# Project specific
-outputs/
-chroma_db/
-*.log
-
-# OS
-.DS_Store
-Thumbs.db
+# Environment variables (never commit)
+.env
