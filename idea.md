@@ -580,15 +580,16 @@ graph TD
 
 ```
 blog-writing-agent/
-├── config.py                 # Configuration constants (model paths, ports)
-├── graph.py                  # CrewAI crew definitions and dispatch logic
-├── schemas.py                # Pydantic models (BlogPlan, ResearchResult, etc.)
-├── state.py                  # CrewState TypedDict and state management
-├── streamlit_app.py          # Main UI for topic input and blog preview
-├── requirements.txt          # Python dependencies
-├── docker-compose.yml        # SearxNG and optional services
-├── README.md                 # Project overview and setup instructions
-├── agents/                   # Agent implementations
+├── .gitignore [inferred]
+├── README.md
+├── requirements.txt
+├── docker-compose.yml
+├── config.py
+├── schemas.py
+├── state.py
+├── graph.py
+├── streamlit_app.py
+├── agents/
 │   ├── router.py
 │   ├── planner.py
 │   ├── researcher.py
@@ -597,19 +598,19 @@ blog-writing-agent/
 │   ├── image_agent.py
 │   ├── citation_manager.py
 │   └── reducer.py
-├── prompts/                  # LLM prompt templates
+├── prompts/
 │   ├── router_prompt.txt
 │   ├── planner_prompt.txt
 │   ├── researcher_prompt.txt
 │   ├── writer_prompt.txt
 │   ├── editor_prompt.txt
 │   └── image_prompt.txt
-├── tools/                    # Utility tools (search, image gen)
+├── tools/
 │   ├── search.py
 │   └── image_gen.py
-└── outputs/                  # Generated content
-    ├── blogs/                # Final .md and .html files
-    └── images/               # Generated images
+└── outputs/                  # runtime-generated (gitignored)
+    ├── blogs/
+    └── images/
 ```
 
 ---
