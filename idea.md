@@ -1,7 +1,7 @@
 # 🤖 Autonomous AI Blog Generation System
 ## End-to-End Multi-Agent Architecture: From Topic to Published Article
 
-> **Stack:** LangGraph · Ollama (Mistral) · SearxNG · Stable Diffusion v1.4 · Streamlit · ChromaDB  
+> **Stack:** CrewAI · Ollama (Mistral) · SearxNG · Stable Diffusion v1.4 · Streamlit · ChromaDB  
 > **Pattern:** Orchestrator–Worker with Router, Planner, Researcher, Writers, Image Agent, Editor & Reducer  
 > **Constraint:** 100% Free & Open-Source · Fully Local · No API Keys Required
 
@@ -17,7 +17,7 @@
 6. [Ethical, Safety & Scaling Considerations](#6-ethical-safety--scaling-considerations)
 7. [Implementation Roadmap](#7-implementation-roadmap)
 8. [Project Folder Structure](#8-project-folder-structure)
-9. [Simplified Core LangGraph Pipeline Reference](#9-simplified-core-langgraph-pipeline-reference)
+9. [Simplified Core CrewAI Pipeline Reference](#9-simplified-core-crewai-pipeline-reference)
 
 ---
 
@@ -39,7 +39,7 @@ This system is built for three primary audiences:
 2. **Educational Content Generation** — A teacher gives a topic; the system produces a well-cited, structured explainer with illustrative images.
 3. **Product/Company Newsletter** — Marketing feeds in a theme; multiple articles are generated in parallel for A/B distribution.
 4. **Research Digests** — Feed in a subject (e.g., "Quantum Computing 2025"); the system synthesizes the latest web findings into a readable digest.
-5. **Interview Portfolio Demo** — Demonstrates mastery of LangGraph state machines, parallel node execution, RAG, and diffusion model APIs in one cohesive project.
+5. **Interview Portfolio Demo** — Demonstrates mastery of CrewAI crew structures, parallel agent execution, RAG, and diffusion model APIs in one cohesive project.
 
 ### Constraints, Assumptions & Success Metrics
 
@@ -136,13 +136,15 @@ class BlogPlan(BaseModel):
 - Extracts key facts, statistics, and quotes
 - Returns a `ResearchResult` with summarized content + source URLs
 
-**Tools:**
-- `SearxSearchWrapper` (from `langchain_community.utilities`) pointed at local SearxNG Docker instance
-- `DuckDuckGoSearchRun` as fallback
-- `BeautifulSoup4` for lightweight HTML content parsing
-- Web fetch via `httpx` for full-page content retrieval
-
-**Parallelization:** LangGraph's `Send()` API dispatches N simultaneous researcher instances — one per section that has a `search_query`.
+**Output Schema (Pydantic):**
+```python
+class ResearchResult(BaseModel):
+    section_id: str
+    search_query: str
+    summary: str
+    sources: List[Dict[str, str]]  # [{"url": str, "title": str, "snippet": str}]
+    timestamp: datetime
+```
 
 ---
 
@@ -155,24 +157,30 @@ class BlogPlan(BaseModel):
 - Embeds an `[IMAGE_PLACEHOLDER_{section_id}]` token where the image should appear
 - Returns a completed `SectionDraft` with content and raw citation references
 
-**Tools:** Ollama Mistral via `langchain_community.llms.Ollama` with carefully structured section writing prompt
-
-**Parallelization:** All writer workers fire simultaneously using LangGraph's `Send()` API. Each uses its own `WorkerState` (isolated from others), and all outputs are merged into `completed_sections` via the `Annotated[list, operator.add]` state key pattern.
+**Output Schema (Pydantic):**
+```python
+class SectionDraft(BaseModel):
+    section_id: str
+    title: str
+    content: str  # Markdown with [citation] markers and [IMAGE_PLACEHOLDER_{id}]
+    word_count: int
+    citations: List[str]  # Raw citation references
+```
 
 ---
 
 #### 📝 Agent 4b: Editor Worker (Sequential or Parallel Refinement)
 **Role:** Quality assurance and refinement specialist.  
 **Responsibilities:**
-- Takes completed `SectionDraft` (or full assembled draft) from Writer workers
+- Takes completed `SectionDraft` from Writer workers for the corresponding section
 - Improves clarity, flow, tone consistency, SEO-friendliness, and adherence to any style guide
 - Ensures target word count is met, removes redundancy, and enhances engagement
 - Checks citation placement and overall structure
-- Returns refined `SectionDraft` or full blog content
+- Returns refined `SectionDraft`
 
 **Tools:** Ollama Mistral with a dedicated editing prompt (see Section 9 for reference implementation).
 
-**Integration:** Runs after Writer workers (can be parallel per section or as a single post-write step before Citation Manager). This adds the classic Researcher → Writer → Editor linear refinement pattern while preserving the full parallel orchestration.
+**Integration:** Runs after Writer workers as parallel per section before Citation Manager. This adds the classic Researcher → Writer → Editor linear refinement pattern while preserving the full parallel orchestration.
 
 ---
 
@@ -184,16 +192,15 @@ class BlogPlan(BaseModel):
 - Saves generated images to `outputs/images/` with deterministic filenames
 - Returns file path and alt text for embedding in final blog
 
-**Tools:**
+**Output Schema (Pydantic):**
 ```python
-from diffusers import StableDiffusionPipeline
-pipe = StableDiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4")
+class ImageResult(BaseModel):
+    section_id: str
+    prompt: str
+    file_path: str
+    alt_text: str
+    size: Tuple[int, int]
 ```
-- Runs on GPU if available, CPU fallback with reduced steps
-- Image size: 512×512 (feature), 512×384 (section images)
-- Guidance scale: 7.5, inference steps: 30 (GPU) / 15 (CPU)
-
-**Parallelization:** Image generation is dispatched in parallel with writer workers using `asyncio.gather()` wrapped in LangGraph task nodes.
 
 ---
 
@@ -226,13 +233,7 @@ pipe = StableDiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4")
 
 ### Inter-Agent Communication Pattern
 
-The system uses a **hierarchical supervisor pattern with event-driven parallel dispatch**:
-
-- The Supervisor (Router → Planner) manages top-level control flow
-- Workers (Researchers, Writers, Image Agents, Editor) communicate exclusively through **shared graph state** — they never call each other directly
-- The `Send()` API in LangGraph enables the Planner to dynamically spawn N workers based on the number of sections at runtime
-- All worker outputs flow back to the shared state via `Annotated[list, operator.add]` — a reducer function that safely merges concurrent writes
-- The Reducer node reads the fully assembled state and produces the final artifact
+The system uses a **hierarchical supervisor pattern with event-driven parallel dispatch via CrewAI**: a Manager agent (implemented by the Planner) oversees task delegation to specialized agents (Router, Planner, Researcher, etc.), enforcing sequential and parallel execution with built-in retry and delegation logic. Agents communicate through shared CrewAI context, with tasks defined as sequential chains (Router → Planner) and parallel crews (Researcher × N, Writer × N, Editor × N). The Planner dynamically spawns parallel crews by invoking `dispatch_crews()`, which creates and executes worker crews in parallel via `asyncio.gather`, merging outputs via CrewAI's state aggregation.
 
 ---
 
@@ -243,26 +244,26 @@ The system uses a **hierarchical supervisor pattern with event-driven parallel d
 ```
 INITIALIZATION
 └── User enters topic in Streamlit UI
-└── GraphState initialized with topic string
-└── LangGraph graph compiled and invoked
+└── CrewState initialized with topic string
+└── CrewAI crew compiled and invoked
 
-ROUTING (Router Node)
+ROUTING (Router Crew)
 └── LLM classifies topic → sets research_required flag
 └── Conditional edge → Planner
 
-PLANNING (Planner Node)
+PLANNING (Planner Crew)
 └── LLM generates BlogPlan (structured output)
-└── Plan stored in graph state
+└── Plan stored in crew state
 └── Parallel dispatch prepared
 
-PARALLEL EXECUTION (Workers — fired simultaneously)
-├── N × Researcher Workers
+PARALLEL EXECUTION (Crews — fired simultaneously)
+├── N × Researcher Crews
 │   └── SearxNG search → page fetch → summarize → return ResearchResult
-├── N × Writer Workers (can start with available research)
+├── N × Writer Crews (can start with available research)
 │   └── Wait for matching ResearchResult → draft section → return SectionDraft
-├── N × Editor Workers (refinement after writers)
+├── N × Editor Crews (refinement after writers)
 │   └── Improve tone, SEO, clarity → refined drafts
-└── N+1 × Image Agent Workers
+└── N+1 × Image Crews
     └── SD pipeline call → save image → return ImageResult
 
 AGGREGATION (Citation Manager)
@@ -270,27 +271,26 @@ AGGREGATION (Citation Manager)
 └── Build citation registry
 └── Resolve inline citation markers
 
-ASSEMBLY (Reducer Node)
+ASSEMBLY (Reducer Crew)
 └── Order sections
 └── Inject images
 └── Inject citations
 └── Write final .md + .html files
 
 TERMINATION
-└── Output paths stored in graph state
+└── Output paths stored in crew state
 └── Streamlit UI reads output and renders preview
 └── Download links activated
 ```
 
 ### State Management Strategy
 
-The entire graph operates on a single typed `GraphState` TypedDict, which is the only object passed between nodes (now extended with fields for flexible refinement pipelines):
+The entire crew operates on a single typed `CrewState` TypedDict, which is the only object passed between crews (now extended with fields for flexible refinement pipelines):
 
 ```python
 from typing import TypedDict, Annotated, List, Optional
-import operator
 
-class GraphState(TypedDict):
+class CrewState(TypedDict):
     # Input
     topic: str
     
@@ -300,14 +300,14 @@ class GraphState(TypedDict):
     # Planner output
     plan: Optional[BlogPlan]
     
-    # Worker outputs — operator.add merges parallel writes safely
-    research_results: Annotated[List[ResearchResult], operator.add]
-    completed_sections: Annotated[List[SectionDraft], operator.add]
-    generated_images: Annotated[List[ImageResult], operator.add]
+    # Worker outputs — merged via CrewAI's state aggregation
+    research_results: List[ResearchResult]
+    completed_sections: List[SectionDraft]
+    generated_images: List[ImageResult]
     
-    # Added for Editor refinement (from standard LangGraph patterns)
-    research_data: Annotated[List[str], operator.add]
-    edits: Annotated[List[str], operator.add]
+    # Added for Editor refinement
+    research_data: List[str]
+    edits: List[str]
     
     # Reducer outputs
     citation_registry: dict
@@ -316,30 +316,49 @@ class GraphState(TypedDict):
     output_path: str
 ```
 
-**Short-Term Memory:** The `GraphState` dict acts as the working memory for a single blog generation run. All agents read from and write to this state.
+**Short-Term Memory:** The `CrewState` dict acts as the working memory for a single blog generation run. All agents read from and write to this state.
 
 **Long-Term Memory (Optional Phase 2):** ChromaDB stores previously generated blogs and their research summaries as vector embeddings. On new runs, the Planner queries ChromaDB to avoid re-researching recently covered topics, and Writer workers can draw on prior research context for faster generation.
+
+ChromaDB Collection Schema:
+- Collection: "blog_research"
+- Documents: Research summaries (text chunks from ResearchResult)
+- Metadata: {"topic": str, "section": str, "urls": list[str], "timestamp": datetime}
+
+Query Logic:
+- Planner: similarity_search(topic, k=3) to retrieve relevant past research
+- Writer: Use retrieved docs as additional context in prompt
 
 **Caching:** Research results are cached to disk as JSON per search query hash. If the same query is re-run within 24 hours, the cached result is used, bypassing SearxNG calls.
 
 ### Asynchronous Orchestration
 
-LangGraph's `Send()` API enables true parallel worker dispatch within the Python event loop (including Editor workers):
+CrewAI enables true parallel crew dispatch within the Python event loop (including Editor crews):
 
 ```python
-def dispatch_workers(state: GraphState):
-    """Dispatch all researcher, writer, editor, and image workers in parallel"""
-    sends = []
+from crewai import Crew, Agent, Task
+
+def dispatch_crews(state: CrewState):
+    """Dispatch all researcher, writer, editor, and image crews in parallel"""
+    crews = []
     for section in state["plan"].sections:
         if section.search_query:
-            sends.append(Send("researcher_worker", {"section": section}))
-        sends.append(Send("writer_worker", {"section": section}))
-        sends.append(Send("editor_worker", {"section": section}))
-        sends.append(Send("image_worker", {"section": section}))
-    return sends
+            researcher_agent = Agent(role="Researcher", goal=f"Research {section.title}", tools=[search_tool])
+            researcher_task = Task(description=f"Execute search: {section.search_query}", agent=researcher_agent)
+            crews.append(Crew(agents=[researcher_agent], tasks=[researcher_task]))
+        writer_agent = Agent(role="Writer", goal=f"Write {section.title}", tools=[llm])
+        writer_task = Task(description=f"Draft section: {section.description}", agent=writer_agent)
+        crews.append(Crew(agents=[writer_agent], tasks=[writer_task]))
+        editor_agent = Agent(role="Editor", goal=f"Edit {section.title}", tools=[llm])
+        editor_task = Task(description=f"Refine section draft", agent=editor_agent)
+        crews.append(Crew(agents=[editor_agent], tasks=[editor_task]))
+        image_agent = Agent(role="ImageGenerator", goal=f"Generate image for {section.title}", tools=[sd_pipeline])
+        image_task = Task(description=f"Generate image: {section.image_prompt}", agent=image_agent)
+        crews.append(Crew(agents=[image_agent], tasks=[image_task]))
+    return crews  # Execute in parallel via asyncio.gather
 ```
 
-Image generation is the most latency-sensitive step. It runs in a `ThreadPoolExecutor` (since the `diffusers` pipeline is not async-native) wrapped inside a LangGraph task node, keeping it off the main event loop.
+Image generation is the most latency-sensitive step. It runs in a `ThreadPoolExecutor` wrapped inside a CrewAI task, keeping it off the main event loop.
 
 ### Error Handling, Retries & Fallbacks
 
@@ -351,7 +370,7 @@ Every worker node is wrapped in a try/except with a three-tier fallback strategy
 
 **Tier 3 — Skip & Continue:** If an Image worker fails, the `[IMAGE_PLACEHOLDER_{id}]` token is replaced with a placeholder text box, and the blog assembly continues without blocking.
 
-LangGraph's built-in checkpointer (using SQLite via `SqliteSaver`) saves graph state after every node completion. If the pipeline crashes mid-run, it can be resumed from the last successful checkpoint rather than starting over.
+CrewAI's built-in checkpointer saves crew state after every crew completion using SQLite persistence. If the pipeline crashes mid-run, it can be resumed from the last successful checkpoint rather than starting over.
 
 ---
 
@@ -359,9 +378,9 @@ LangGraph's built-in checkpointer (using SQLite via `SqliteSaver`) saves graph s
 
 ### Stack Justification
 
-**LangGraph** is chosen over CrewAI and AutoGen for this project for three reasons. First, its `Send()` API provides the most elegant native support for the orchestrator–worker scatter-gather pattern. Second, its explicit `TypedDict` state gives full transparency and debuggability over the shared state. Third, it has native SQLite checkpointing for crash recovery and LangSmith integration for observability — both critical for production-grade builds.
+**CrewAI** orchestrates agents via its hierarchical crew structure: a Manager agent oversees task delegation to specialized agents (Router, Planner, Researcher, etc.), enforcing sequential and parallel execution with built-in retry and delegation logic. Agents communicate through shared CrewAI context, with tasks defined as sequential chains (Router → Planner) and parallel crews (Researcher × N, Writer × N, Editor × N).
 
-**Ollama + Mistral 7B** is the LLM backend. Mistral 7B v0.3 is the best-in-class 7B model for instruction following, structured output generation, and text quality — all essential for a content generation pipeline. It runs at 4-bit quantization (Q4_K_M) on modest consumer hardware and supports tool-calling via its native function format, which LangGraph can leverage for the Router's decision logic.
+**Ollama + Mistral 7B** is the LLM backend. Mistral 7B v0.3 is the best-in-class 7B model for instruction following, structured output generation, and text quality — all essential for a content generation pipeline. It runs at 4-bit quantization (Q4_K_M) on modest consumer hardware and supports tool-calling via its native function format, which CrewAI can leverage for the Router's decision logic.
 
 **SearxNG** (self-hosted via Docker) is the search layer. It is completely free, aggregates Google, DuckDuckGo, Bing, and Wikipedia simultaneously, strips tracking, and integrates natively with LangChain's `SearxSearchWrapper`. DuckDuckGo (`langchain_community.tools.DuckDuckGoSearchRun`) is the zero-setup fallback.
 
@@ -383,7 +402,7 @@ graph TD
         REDUCER["🔗 Reducer Node\nAssembly + Citation Injection"]
     end
 
-    subgraph WORKER_LAYER["⚙️ Worker Layer (Parallel Execution via Send API)"]
+    subgraph WORKER_LAYER["⚙️ Worker Layer (Parallel Execution via CrewAI Tasks)"]
         direction LR
         R1["🔍 Researcher\nWorker 1"]
         R2["🔍 Researcher\nWorker 2"]
@@ -410,27 +429,27 @@ graph TD
         CHROMA["🗄️ ChromaDB\nLong-Term Memory"]
     end
 
-    subgraph STATE["📦 Shared Graph State (TypedDict)"]
+    subgraph STATE["📦 Shared Crew State (TypedDict)"]
         S1["topic · plan · research_required"]
-        S2["research_results: List (merged via operator.add)"]
-        S3["completed_sections: List (merged via operator.add)"]
-        S4["generated_images: List (merged via operator.add)"]
+        S2["research_results: List (merged via CrewAI aggregation)"]
+        S3["completed_sections: List (merged via CrewAI aggregation)"]
+        S4["generated_images: List (merged via CrewAI aggregation)"]
         S5["citation_registry · final_markdown"]
     end
 
     ROUTER -->|Sets research_required| PLANNER
-    PLANNER -->|"Send(researcher_worker, section)"| R1
-    PLANNER -->|"Send(researcher_worker, section)"| R2
-    PLANNER -->|"Send(researcher_worker, section)"| Rn
-    PLANNER -->|"Send(writer_worker, section)"| W1
-    PLANNER -->|"Send(writer_worker, section)"| W2
-    PLANNER -->|"Send(writer_worker, section)"| Wn
-    PLANNER -->|"Send(editor_worker, section)"| E1
-    PLANNER -->|"Send(editor_worker, section)"| E2
-    PLANNER -->|"Send(editor_worker, section)"| En
-    PLANNER -->|"Send(image_worker, prompt)"| IM1
-    PLANNER -->|"Send(image_worker, prompt)"| IM2
-    PLANNER -->|"Send(image_worker, prompt)"| IMn
+    PLANNER -->|"Crew(researcher_agent, task)"| R1
+    PLANNER -->|"Crew(researcher_agent, task)"| R2
+    PLANNER -->|"Crew(researcher_agent, task)"| Rn
+    PLANNER -->|"Crew(writer_agent, task)"| W1
+    PLANNER -->|"Crew(writer_agent, task)"| W2
+    PLANNER -->|"Crew(writer_agent, task)"| Wn
+    PLANNER -->|"Crew(editor_agent, task)"| E1
+    PLANNER -->|"Crew(editor_agent, task)"| E2
+    PLANNER -->|"Crew(editor_agent, task)"| En
+    PLANNER -->|"Crew(image_agent, task)"| IM1
+    PLANNER -->|"Crew(image_agent, task)"| IM2
+    PLANNER -->|"Crew(image_agent, task)"| IMn
 
     R1 & R2 & Rn -->|ResearchResult| STATE
     W1 & W2 & Wn -->|SectionDraft| STATE
@@ -457,36 +476,152 @@ graph TD
 
 ## 5. Tooling & Infrastructure
 
-(Original content unchanged)
+### Local Setup Requirements
+
+**Ollama Installation:**
+- Download and install Ollama from [ollama.ai](https://ollama.ai)
+- Pull Mistral 7B: `ollama pull mistral:7b`
+- Verify: `ollama list` should show `mistral:7b`
+
+**SearxNG Setup:**
+- Install Docker Desktop
+- Run: `docker run -d -p 8080:8080 --name searxng searxng/searxng`
+- Access at `http://localhost:8080` (no API key needed)
+- Fallback: Use DuckDuckGo via `langchain_community.tools.DuckDuckGoSearchRun`
+
+**Stable Diffusion v1.4:**
+- Install via pip: `pip install diffusers torch`
+- Pre-download model: `python -c "from diffusers import StableDiffusionPipeline; pipe = StableDiffusionPipeline.from_pretrained('CompVis/stable-diffusion-v1-4')"`
+- GPU: Requires CUDA-compatible GPU with ≥8GB VRAM
+- CPU fallback: Automatic detection, reduced steps
+
+**ChromaDB (Optional):**
+- `pip install chromadb`
+- In-process, no server needed; persists to `./chroma_db/`
+
+**Streamlit UI:**
+- `pip install streamlit`
+- Run: `streamlit run streamlit_app.py`
+
+### Hardware Recommendations
+
+- **Minimum:** CPU-only (e.g., Intel i5), 16GB RAM, 50GB storage
+- **Recommended:** RTX 3060 (12GB VRAM), 32GB RAM for full parallel execution
+- **Scaling:** For multiple concurrent blogs, use separate processes or containers
+
+### Development Environment
+
+- Python 3.9+
+- Virtual environment: `python -m venv bwa_env && source bwa_env/bin/activate`
+- Dependencies: Install from `requirements.txt` (includes CrewAI, LangChain, etc.)
 
 ---
 
 ## 6. Ethical, Safety & Scaling Considerations
 
-(Original content unchanged)
+### Ethical Considerations
+
+- **Bias Mitigation:** Mistral 7B may inherit biases from training data; use diverse search sources (SearxNG aggregates multiple engines) to balance perspectives.
+- **Fact-Checking:** Citations are extracted from live web results, but LLM hallucinations can occur; implement manual review for critical topics.
+- **Content Ownership:** Generated blogs are original compositions; respect copyright of cited sources by linking properly.
+- **Transparency:** Clearly mark AI-generated content; avoid misleading readers about authorship.
+
+### Safety Measures
+
+- **Input Validation:** Router agent rejects harmful or illegal topics (e.g., violence, hate speech).
+- **Output Filtering:** Editor agent checks for inappropriate content; add post-processing filters if needed.
+- **Error Handling:** 3-tier fallbacks prevent crashes; degraded mode (LLM-only) ensures completion without external data.
+- **Resource Limits:** Cap image generation to prevent abuse; monitor Ollama usage to avoid overheating.
+
+### Scaling Strategies
+
+- **Horizontal Scaling:** Run multiple instances via Docker containers; use CrewAI workers for distributed execution.
+- **Caching & Optimization:** Research caching reduces API calls; ChromaDB RAG speeds up repeated topics.
+- **Performance Tuning:** GPU acceleration for images; async dispatch for parallelism; profile bottlenecks with LangSmith.
+- **Production Deployment:** Use FastAPI for worker services; orchestrate with Kubernetes for high-volume generation.
 
 ---
 
 ## 7. Implementation Roadmap
 
-(Original content unchanged — the Editor agent fits naturally into Phase 2 parallelization and Phase 4 refinement features)
+### Phase 1: Core Sequential Pipeline (1-2 weeks)
+- Implement Router, Planner, Researcher, Writer, Citation Manager, Reducer
+- Basic Streamlit UI for topic input and output preview
+- Sequential execution via single CrewAI crew
+- Test with local Ollama + SearxNG
+
+### Phase 2: Parallel Execution & Images (2-3 weeks)
+- Add parallel dispatch for Researcher×N, Writer×N, Image×N
+- Integrate Editor as parallel refinement per section
+- Implement asyncio.gather for true parallelism
+- Add Stable Diffusion v1.4 image generation
+
+### Phase 3: Advanced Features (1-2 weeks)
+- ChromaDB RAG for long-term memory
+- Research caching and error fallbacks
+- Citation resolution and image placeholder substitution
+- HTML export and metadata generation
+
+### Phase 4: Production Polish (1 week)
+- UI enhancements (progress bars, file downloads)
+- Logging and monitoring with LangSmith
+- Docker containerization for easy deployment
+- Performance optimization and GPU support
+
+### Phase 5: Extensions (Future)
+- Multi-topic batch processing
+- Human-in-the-loop editing UI
+- Publishing integrations (WordPress, Ghost)
+- Multilingual support and fine-tuning
 
 ---
 
 ## 8. Project Folder Structure
 
-(Original content unchanged — add `prompts/editor_prompt.txt` to the `prompts/` folder for the new Editor node)
+```
+blog-writing-agent/
+├── config.py                 # Configuration constants (model paths, ports)
+├── graph.py                  # CrewAI crew definitions and dispatch logic
+├── schemas.py                # Pydantic models (BlogPlan, ResearchResult, etc.)
+├── state.py                  # CrewState TypedDict and state management
+├── streamlit_app.py          # Main UI for topic input and blog preview
+├── requirements.txt          # Python dependencies
+├── docker-compose.yml        # SearxNG and optional services
+├── README.md                 # Project overview and setup instructions
+├── agents/                   # Agent implementations
+│   ├── router.py
+│   ├── planner.py
+│   ├── researcher.py
+│   ├── writer.py
+│   ├── editor.py
+│   ├── image_agent.py
+│   ├── citation_manager.py
+│   └── reducer.py
+├── prompts/                  # LLM prompt templates
+│   ├── router_prompt.txt
+│   ├── planner_prompt.txt
+│   ├── researcher_prompt.txt
+│   ├── writer_prompt.txt
+│   ├── editor_prompt.txt
+│   └── image_prompt.txt
+├── tools/                    # Utility tools (search, image gen)
+│   ├── search.py
+│   └── image_gen.py
+└── outputs/                  # Generated content
+    ├── blogs/                # Final .md and .html files
+    └── images/               # Generated images
+```
 
 ---
 
-## 9. Simplified Core LangGraph Pipeline Reference
+## 9. Simplified Core CrewAI Pipeline Reference
 
 ### 1. High-level architecture
 
-Think of this as a **multi-agent blog pipeline** (complementary to the full parallel system above):
+Think of this as a **multi-agent blog pipeline** (complementary to the full parallel system above). This section provides a simplified sequential CrewAI crew demo for prototyping, contrasting with the full parallel crew dispatch (via asyncio.gather) described in Sections 2–4.
 
-- **Orchestrator (LangGraph)**  
-  - Main state machine that routes work between agents.
+- **Orchestrator (CrewAI)**  
+  - Main crew structure that routes work between agents.
   - Accepts a topic and outputs a finished blog draft + metadata.
 
 - **Agents (workers)**  
@@ -496,7 +631,7 @@ Think of this as a **multi-agent blog pipeline** (complementary to the full para
 
 - **Infrastructure layer**
   - **LangChain**: tools, prompts, memory, chains.
-  - **LangGraph**: orchestrates nodes (agents) with state.
+  - **CrewAI**: orchestrates crews (agents) with shared context and tasks.
   - **LangSmith**: logs, traces, evals for debugging and tuning (optional).
   - **Workers** (if you want scale): each agent can be a separate worker (e.g., via FastAPI endpoints).
 
@@ -505,7 +640,7 @@ Diagram-style flow:
 ```
 User topic
    ↓
-LangGraph Orchestrator
+CrewAI Orchestrator
    ↓
 → Researcher agent → Writer agent → Editor agent → Final blog
 ```
@@ -514,17 +649,16 @@ LangGraph Orchestrator
 
 ### 2. Core components (for your code)
 
-#### State schema (LangGraph)
+#### State schema (CrewAI)
 
-Define a shared `State` to carry data between agents (already extended in the main `GraphState` above):
+Define a shared `State` to carry data between crews (already extended in the main `CrewState` above):
 
 ```python
-from typing import TypedDict, Annotated, List
-from langgraph.graph import MessagesState, START, END
+from typing import TypedDict, List
 
-class AgentState(MessagesState):
+class AgentState(TypedDict):
     topic: str
-    research_data: List[str]
+    research: List[str]
     blog_draft: str
     edits: List[str]
 ```
@@ -550,8 +684,7 @@ def researcher_node(state: AgentState):
     search_query = f"Blog background: {topic}"
     results = search_tool.run(search_query)  # returns string or parsed results
     return {
-        "research_data": [results],  # or parsed list
-        "messages": state["messages"] + [("system", "Researcher: gathered background info")]
+        "research": [results],  # or parsed list
     }
 ```
 
@@ -583,11 +716,10 @@ def writer_node(state: AgentState):
     chain = prompt | llm
     blog = chain.invoke({
         "topic": state["topic"],
-        "research": "\n".join(state["research_data"]),
+        "research": "\n".join(state["research"]),
     }).content
     return {
         "blog_draft": blog,
-        "messages": state["messages"] + [("system", "Writer: generated draft")]
     }
 ```
 
@@ -619,58 +751,45 @@ def editor_node(state: AgentState):
     return {
         "blog_draft": improved,
         "edits": [improved],
-        "messages": state["messages"] + [("system", "Editor: improved draft")]
     }
 ```
 
 ***
 
-### 3. Orchestrator (LangGraph workflow)
+### 3. Orchestrator (CrewAI workflow)
 
-Wire the agents into a graph (this can be used as a lightweight sequential prototype before scaling to full parallel Send() dispatch):
-
-```python
-from langgraph.graph import StateGraph
-
-graph_builder = StateGraph(AgentState)
-
-graph_builder.add_node("Researcher", researcher_node)
-graph_builder.add_node("Writer", writer_node)
-graph_builder.add_node("Editor", editor_node)
-
-graph_builder.set_entry_point("Researcher")
-graph_builder.add_edge("Researcher", "Writer")
-graph_builder.add_edge("Writer", "Editor")
-graph_builder.add_edge("Editor", END)
-
-blog_app = graph_builder.compile()
-```
-
-Run it:
+Wire the agents into a crew (this can be used as a lightweight sequential prototype before scaling to full parallel crew dispatch):
 
 ```python
-result = blog_app.invoke(
-    {
-        "topic": "How AI agents are changing software development",
-        "research_data": [],
-        "blog_draft": "",
-        "edits": [],
-        "messages": [("user", "Write a blog on this topic")],
-    }
-)
+from crewai import Crew, Agent, Task
 
-print(result["blog_draft"])
+# Define agents
+researcher_agent = Agent(role="Researcher", goal="Fetch background info", tools=[search_tool])
+writer_agent = Agent(role="Writer", goal="Draft blog post", tools=[llm])
+editor_agent = Agent(role="Editor", goal="Refine draft", tools=[llm])
+
+# Define tasks
+research_task = Task(description="Research the topic", agent=researcher_agent)
+write_task = Task(description="Write the blog draft", agent=writer_agent)
+edit_task = Task(description="Edit the draft", agent=editor_agent)
+
+# Create crew
+blog_crew = Crew(agents=[researcher_agent, writer_agent, editor_agent], tasks=[research_task, write_task, edit_task])
+
+# Run crew
+result = blog_crew.kickoff(inputs={"topic": "AI in healthcare"})
+print(result)
 ```
 
 ***
 
-### 4. Orchestrator vs worker-node pattern (advanced)
+### 4. Orchestrator vs worker-crew pattern (advanced)
 
-If you want **true workers** (separate processes, not just nodes) — scale the full system:
+If you want **true workers** (separate processes, not just crews) — scale the full system:
 
-- **Orchestrator** (LangGraph)  
-  - Only decides “who runs next” and manages state.
-- **Worker nodes** (FastAPI services or LangChain workers)  
+- **Orchestrator** (CrewAI)  
+  - Only decides "who runs next" and manages state.
+- **Worker crews** (FastAPI services or CrewAI workers)  
   - Each agent runs as an HTTP service:
     - `/research` → researcher agent
     - `/write` → writer agent
@@ -678,7 +797,7 @@ If you want **true workers** (separate processes, not just nodes) — scale the 
 
 With **Orkes Conductor** or similar (optional for production):
 
-- LangGraph dispatches tasks to worker services.
+- CrewAI dispatches tasks to worker services.
 - Workers return results; orchestrator persists state and decides next step.
 
 Minimal worker sketch (FastAPI):
@@ -701,7 +820,7 @@ def research_task(req: ResearchReq):
     return ResearchResp(research_data=["snippet1", "snippet2"])
 ```
 
-Then your LangGraph orchestrator calls `http.post("/research")`, etc.
+Then your CrewAI orchestrator calls `http.post("/research")`, etc.
 
 ***
 
@@ -710,81 +829,35 @@ Then your LangGraph orchestrator calls `http.post("/research")`, etc.
 Here’s a **minimal, runnable demo** you can copy-paste and extend in 24 hours (fully adapted to the local Ollama + SearxNG stack):
 
 ```python
-from typing import TypedDict, List
-from langchain_community.utilities import SearxSearchWrapper  # or DuckDuckGoSearchRun
+from langchain_community.utilities import SearxSearchWrapper
 from langchain_community.chat_models import ChatOllama
-from langchain_core.prompts import ChatPromptTemplate
-from langgraph.graph import StateGraph, MessagesState, START, END
+from crewai import Crew, Agent, Task
 
 # Set up tools and LLM (local only)
 search_tool = SearxSearchWrapper(searx_host="http://localhost:8080")
 llm = ChatOllama(model="mistral", temperature=0.3)
 
-# State
-class AgentState(MessagesState):
-    topic: str
-    research_data: List[str]
-    blog_draft: List[str]
+# Define agents
+researcher_agent = Agent(role="Researcher", goal="Fetch background info", tools=[search_tool])
+writer_agent = Agent(role="Writer", goal="Draft blog post", tools=[llm])
 
-# Researcher node
-def researcher_node(state: AgentState):
-    topic = state["topic"]
-    results = search_tool.run(f"Blog background: {topic}")
-    research = [results]
-    return {
-        "research_data": research,
-    }
+# Define tasks
+research_task = Task(description="Research the topic", agent=researcher_agent)
+write_task = Task(description="Write the blog draft", agent=writer_agent)
 
-# Writer node
-BLOG_PROMPT = """
-Write a clear, engaging blog post about:
-
-Topic: {topic}
-
-Research snippets:
-{research}
-
-Format as markdown with 3–4 short paragraphs.
-"""
-
-prompt = ChatPromptTemplate.from_template(BLOG_PROMPT)
-writer_chain = prompt | llm
-
-def writer_node(state: AgentState):
-    blog = writer_chain.invoke({
-        "topic": state["topic"],
-        "research": "\n".join(state["research_data"]),
-    }).content
-    return {"blog_draft": [blog]}
-
-# Build graph (add Editor node similarly for full refinement)
-graph_builder = StateGraph(AgentState)
-graph_builder.add_node("Researcher", researcher_node)
-graph_builder.add_node("Writer", writer_node)
-
-graph_builder.set_entry_point("Researcher")
-graph_builder.add_edge("Researcher", "Writer")
-graph_builder.add_edge("Writer", END)
-
-blog_app = graph_builder.compile()
+# Create crew
+blog_crew = Crew(agents=[researcher_agent, writer_agent], tasks=[research_task, write_task])
 
 # Run demo
 if __name__ == "__main__":
     topic = "How AI agents are changing software development"
-    result = blog_app.invoke(
-        {
-            "topic": topic,
-            "research_data": [],
-            "blog_draft": [],
-            "messages": [("user", "Write a blog on this topic")],
-        }
-    )
-    print(result["blog_draft"][0])
+    result = blog_crew.kickoff(inputs={"topic": topic})
+    print(result)
 ```
 
 - Install (local only):
   ```bash
-  pip install langchain langgraph langchain-community
+  pip install langchain langchain-community crewai
   # No API keys needed
   ```
 - Run the script and it outputs a blog draft. This serves as a quick prototype that can be expanded into the full 8-agent parallel system.
@@ -819,6 +892,13 @@ Given your time box:
 3. **Day 1 evening (2–4 hours)**  
    - Add the Editor node and basic checks (word count, headings, etc.).
 4. **If you want true workers**  
-   - Wrap each agent in a FastAPI service and wire them via LangGraph.
+   - Wrap each agent in a FastAPI service and wire them via CrewAI.
 
 *This reference pipeline complements the main advanced architecture without replacing any of its parallel, image-enabled, citation-rich capabilities.*
+
+## Resolution Summary
+- Gap 1 (CrewAI usage): Modified stack and justification in Section 4 to integrate CrewAI for agent orchestration.
+- Gap 2 (Editor parallelism): Updated Agent 4b integration in Section 2 to specify parallel per section.
+- Gap 3 (Editor inputs): Clarified Editor responsibilities in Section 2 to take SectionDraft from corresponding Writer.
+- Gap 4 (ChromaDB details): Expanded Long-Term Memory in Section 3 with collection schema and query logic.
+- Orchestration contradiction: Updated communication pattern, dispatch example, and diagram in Sections 2, 3, 4 to use CrewAI crews/tasks consistently.
