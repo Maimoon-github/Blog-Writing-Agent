@@ -2,13 +2,13 @@
 Lightweight Editor Node (roadmap Step 8).
 Pure Python + flat asyncio.gather compatible.
 Strictly preserves [IMAGE_PLACEHOLDER_...] and [citation] tokens.
-CrewAI v1.14.2 + LangChain json_mode pattern.
+CrewAI 1.x + LangChain json_mode pattern.
 """
 
 from pathlib import Path
 from typing import Dict, Any
 
-from langchain_community.chat_models import ChatOllama
+from langchain_ollama import ChatOllama
 
 from config import OLLAMA_MODEL, OLLAMA_BASE_URL
 from schemas import SectionDraft
@@ -21,6 +21,9 @@ EDITOR_PROMPT: str = PROMPT_PATH.read_text(encoding="utf-8")
 
 # ----------------------------------------------------------------------
 # LLM (structured output)
+# Note: langchain_ollama.ChatOllama is used here (not crewai.LLM) because
+# editor_node is called as a pure Python function, not as a CrewAI Agent.
+# .with_structured_output() is a LangChain method not available on crewai.LLM.
 # ----------------------------------------------------------------------
 llm = ChatOllama(
     model=OLLAMA_MODEL,
@@ -38,7 +41,6 @@ def editor_node(draft: SectionDraft) -> Dict[str, Any]:
     if not isinstance(draft, SectionDraft):
         raise ValueError("editor_node: input must be a valid SectionDraft object")
 
-    # Format prompt (editor prompt must instruct to preserve tokens verbatim)
     formatted_prompt = EDITOR_PROMPT.format(
         section_title=draft.title,
         current_content=draft.content,
@@ -54,10 +56,9 @@ def editor_node(draft: SectionDraft) -> Dict[str, Any]:
             break
         except Exception:
             if attempt == 2:
-                # Tier-2 fallback (return original unchanged)
-                edited = draft
+                edited = draft  # Tier-2 fallback: return original unchanged
 
-    # Final validation: ensure placeholders & citations were preserved
+    # Preserve section_id in case the LLM changed it
     if edited and edited.section_id != draft.section_id:
         edited.section_id = draft.section_id
 

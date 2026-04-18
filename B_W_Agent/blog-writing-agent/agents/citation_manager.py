@@ -8,7 +8,7 @@ Pure-Python citation processor for the Autonomous Blog Generation Agent.
 - Builds 1-based citation registry
 - Resolves generic [citation] markers → numbered [N]
 - Appends formatted ## References section
-- Returns new CrewState objects only (CrewAI v1.14.2 safe)
+- Returns partial dict for CrewState merging (graph.py safe)
 
 References:
 - roadmap.html → Phase 3 Step 3
@@ -17,7 +17,7 @@ References:
 
 import re
 import logging
-from typing import List, Dict
+from typing import List, Dict, Any
 from copy import deepcopy
 
 from schemas import ResearchResult, SectionDraft
@@ -124,8 +124,7 @@ def format_references(registry: Dict[int, Dict[str, str]]) -> str:
 
 def process_citations(state: CrewState) -> CrewState:
     """
-    Main entry point: processes citations and returns updated CrewState.
-    Does NOT mutate the input state.
+    Internal helper — kept exactly as you wrote it.
     """
     registry = build_citation_registry(state.get("research_results", []))
 
@@ -133,7 +132,6 @@ def process_citations(state: CrewState) -> CrewState:
         state.get("completed_sections", []), registry
     )
 
-    # Append References to the last section (or create one if empty)
     references_md = format_references(registry)
     if updated_sections and references_md:
         last = updated_sections[-1]
@@ -150,9 +148,8 @@ def process_citations(state: CrewState) -> CrewState:
         )
         updated_sections = [placeholder]
 
-    # Return new state (CrewAI v1.14.2 safe)
     new_state: CrewState = {
-        **state,  # shallow copy of other fields
+        **state,
         "citation_registry": registry,
         "completed_sections": updated_sections,
     }
@@ -161,12 +158,32 @@ def process_citations(state: CrewState) -> CrewState:
 
 
 # ----------------------------------------------------------------------
+# Node function expected by graph.py (partial dict for state.update)
+# ----------------------------------------------------------------------
+def citation_manager_node(state: CrewState) -> Dict[str, Any]:
+    """
+    citation_manager_node(state) → {"citation_registry": ..., "completed_sections": ...}
+    Exactly matches the contract used by every other node in the pipeline.
+    """
+    updated = process_citations(state)
+    return {
+        "citation_registry": updated["citation_registry"],
+        "completed_sections": updated["completed_sections"],
+    }
+
+
+# ----------------------------------------------------------------------
+# Exports
+# ----------------------------------------------------------------------
+__all__ = ["citation_manager_node", "process_citations"]
+
+
+# ----------------------------------------------------------------------
 # Self-test when run directly
 # ----------------------------------------------------------------------
 if __name__ == "__main__":
     print("🧪 Testing agents/citation_manager.py...")
 
-    # Minimal test data
     from schemas import ResearchResult
     from datetime import datetime
 
@@ -204,10 +221,10 @@ if __name__ == "__main__":
         "output_path": "",
     }
 
-    result = process_citations(test_state)
+    result = citation_manager_node(test_state)
 
     assert len(result["citation_registry"]) == 1, "Deduplication failed"
     assert "[1]" in result["completed_sections"][0].content, "Marker replacement failed"
     assert "## References" in result["completed_sections"][0].content, "References missing"
 
-    print("✅ All tests passed — citation_manager is production-ready.")
+    print("✅ All tests passed — citation_manager_node is production-ready.")

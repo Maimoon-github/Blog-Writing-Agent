@@ -1,13 +1,23 @@
 """streamlit_app.py
 Final UI layer — STEP 11 of the roadmap.
-Clean, production-ready Streamlit 1.56.0 interface for the full 8-agent pipeline.
+Clean, production-ready Streamlit interface for the full 8-agent pipeline.
 """
+
+# -----------------------------------------------------------------------
+# MUST be set before ANY import of transformers or diffusers.
+# Suppresses the hundreds of `Accessing __path__` aliasing warnings that
+# fire at module-init time in transformers 4.45+ / diffusers combinations.
+# Root-fix: pin transformers==4.44.2 in requirements.txt
+# -----------------------------------------------------------------------
+import os
+os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "1"
+os.environ["TRANSFORMERS_VERBOSITY"] = "error"
 
 import streamlit as st
 from pathlib import Path
 
 from graph import run_pipeline_sync
-from schemas import CrewState
+from state import CrewState
 
 # ----------------------------------------------------------------------
 # Page config
@@ -29,7 +39,7 @@ with st.sidebar:
     st.header("Pipeline")
     st.caption("Router → Planner → Parallel Workers → Citation Manager → Reducer")
     st.info("Expected runtime: 3–8 minutes on consumer GPU")
-    
+
     if st.button("🗑️ Clear session & restart", use_container_width=True):
         for key in list(st.session_state.keys()):
             del st.session_state[key]
@@ -60,7 +70,6 @@ if st.button("🚀 Generate Full Blog Post", type="primary", use_container_width
 
     st.session_state.last_topic = topic.strip()
 
-    # Progress status containers (updated post-pipeline — Streamlit synchronous nature)
     status_router   = st.status("🔀 **Router** — classifying intent...", expanded=True)
     status_planner  = st.status("📋 **Planner** — generating BlogPlan...", expanded=True)
     status_parallel = st.status("⚡ **Parallel workers** — researching, writing, editing & generating images...", expanded=True)
@@ -71,7 +80,6 @@ if st.button("🚀 Generate Full Blog Post", type="primary", use_container_width
         with st.spinner("Running full 8-agent pipeline..."):
             final_state: CrewState = run_pipeline_sync(topic.strip())
 
-        # Mark all phases complete
         status_router.update(label="✅ Router complete", state="complete")
         status_planner.update(label="✅ Planner complete", state="complete")
         status_parallel.update(
@@ -99,7 +107,6 @@ if st.session_state.pipeline_state:
     st.divider()
     st.subheader(plan.get("blog_title", "Generated Blog Post"))
 
-    # Inline Markdown preview
     if state.get("final_markdown"):
         st.markdown(state["final_markdown"])
     else:
@@ -107,7 +114,6 @@ if st.session_state.pipeline_state:
 
     st.divider()
 
-    # Images gallery
     images = state.get("generated_images", [])
     if images:
         st.subheader("🖼️ Generated Images")
@@ -119,7 +125,6 @@ if st.session_state.pipeline_state:
                 else:
                     st.caption(f"📍 {img.alt_text} (placeholder)")
 
-    # Download buttons
     st.subheader("📥 Download Outputs")
     col_md, col_html = st.columns(2)
 

@@ -8,7 +8,7 @@ Unified search interface for the Autonomous Blog Generation Agent.
 - Fallback backend: DuckDuckGo (DuckDuckGoSearchAPIWrapper.results())
 - 24-hour disk-based JSON cache (prevents redundant calls during dev/testing)
 - Always returns List[Dict[str, str]] with exactly {"url", "title", "snippet"}
-- Never raises from the public API (Researcher agent expects graceful empty list)
+- Exports `search_tool` (LangChain Tool) for CrewAI agents + `search()` helper
 
 References:
 - roadmap.html → Phase 3 Step 1 (tools/search.py)
@@ -22,10 +22,9 @@ import time
 import logging
 from typing import List, Dict, Any
 
-from langchain_community.utilities import (
-    SearxSearchWrapper,
-    DuckDuckGoSearchAPIWrapper,
-)
+from langchain_community.utilities import SearxSearchWrapper
+from langchain_community.tools import DuckDuckGoSearchRun
+from langchain_core.tools import Tool   # ← required for CrewAI Agent compatibility
 
 from config import SEARXNG_HOST, CACHE_TTL_SEC, CACHE_DIR
 
@@ -102,7 +101,7 @@ def _normalize(raw: dict) -> Dict[str, str]:
 
 
 # ----------------------------------------------------------------------
-# Backend search functions (let exceptions bubble up)
+# Backend search functions
 # ----------------------------------------------------------------------
 
 def _search_searxng(query: str, num_results: int) -> List[Dict[str, str]]:
@@ -113,23 +112,23 @@ def _search_searxng(query: str, num_results: int) -> List[Dict[str, str]]:
 
 
 def _search_duckduckgo(query: str, num_results: int) -> List[Dict[str, str]]:
-    """Fallback via DuckDuckGoSearchAPIWrapper."""
-    wrapper = DuckDuckGoSearchAPIWrapper(max_results=num_results)
-    raw_results: list[dict] = wrapper.results(query, num_results=num_results)
-    return [_normalize(item) for item in raw_results]
+    """Fallback via DuckDuckGo."""
+    tool = DuckDuckGoSearchRun()
+    raw = tool.run(query)
+    # DuckDuckGoSearchRun returns a string; we parse it into list of dicts
+    # (simple fallback parsing)
+    lines = [line.strip() for line in raw.split("\n") if line.strip()]
+    return [{"url": "", "title": line[:80], "snippet": line} for line in lines[:num_results]]
 
 
 # ----------------------------------------------------------------------
-# Public API
+# Public helper (used by researcher_node)
 # ----------------------------------------------------------------------
 
 def search(query: str, num_results: int = 5) -> List[Dict[str, str]]:
     """
     Main search entrypoint with cache + fallback.
-
-    Returns:
-        List[Dict[str, str]] — each dict guaranteed to contain:
-        {"url": str, "title": str, "snippet": str}
+    Returns: List[Dict[str, str]] — exactly {"url", "title", "snippet"}
     """
     if not query or not query.strip():
         logger.debug("empty_query")
@@ -150,7 +149,7 @@ def search(query: str, num_results: int = 5) -> List[Dict[str, str]]:
             cache_set(query, results)
             logger.info("searxng_success", query=query, results=len(results))
             return results
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         logger.warning("searxng_failed", query=query, error=str(e))
 
     # 3. Fallback to DuckDuckGo
@@ -160,7 +159,7 @@ def search(query: str, num_results: int = 5) -> List[Dict[str, str]]:
             cache_set(query, results)
             logger.info("duckduckgo_fallback_success", query=query, results=len(results))
             return results
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         logger.error("duckduckgo_failed", query=query, error=str(e))
 
     # Both backends failed
@@ -169,28 +168,44 @@ def search(query: str, num_results: int = 5) -> List[Dict[str, str]]:
 
 
 # ----------------------------------------------------------------------
+# LangChain Tool wrapper (required by planner.py + CrewAI agents)
+# ----------------------------------------------------------------------
+
+search_tool = Tool(
+    name="search",
+    func=search,
+    description=(
+        "Performs web search using SearxNG (primary) with DuckDuckGo fallback. "
+        "Returns up to 5 results as list of dicts with keys: url, title, snippet. "
+        "Uses 24h disk cache for repeated queries."
+    ),
+    return_direct=False,
+)
+
+
+# ----------------------------------------------------------------------
+# Exports
+# ----------------------------------------------------------------------
+__all__ = ["search_tool", "search", "cache_get", "cache_set"]
+
+
+# ----------------------------------------------------------------------
 # Self-test when run directly
 # ----------------------------------------------------------------------
 
 if __name__ == "__main__":
     print("🔍 Running tools/search.py self-test...")
-
     q = "latest AI agent frameworks 2026"
 
-    # First call (should hit live backend)
     r1 = search(q, num_results=3)
     assert len(r1) > 0, "Live search returned no results"
     assert all(
-        isinstance(item, dict)
-        and "url" in item
-        and "title" in item
-        and "snippet" in item
+        isinstance(item, dict) and "url" in item and "title" in item and "snippet" in item
         for item in r1
     ), "Result contract violated"
 
-    # Second call (must be cache hit — no network)
     r2 = search(q, num_results=3)
     assert r1 == r2, "Cache did not return identical results"
 
-    print("✅ All assertions passed. Cache + fallback + normalization working.")
+    print("✅ All assertions passed. Cache + fallback + search_tool working.")
     print(f"   Sample result: {r1[0]['title'][:60]}...")

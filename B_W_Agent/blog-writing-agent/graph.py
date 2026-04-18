@@ -11,7 +11,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
 
-from schemas import CrewState
+from state import CrewState                  # ← FIXED: correct source of TypedDict
 from state import CrewState as CrewStateTypedDict  # TypedDict reference
 from agents.router import router_node
 from agents.planner import planner_node, dispatch_crews
