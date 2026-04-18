@@ -811,11 +811,10 @@ curl http://localhost:11434/api/tags</div>
           <div class="step">
             <div class="step-left"><div class="step-dot p1">3</div><div class="step-line"></div></div>
             <div class="step-content">
-              <div class="step-name">Create Python virtual environment</div>
+              <div class="step-name">Use Conda Python virtual environment</div>
               <div class="step-desc">Use Python 3.10+ (3.11 recommended for best CrewAI compatibility). Activate before all subsequent steps.</div>
-              <div class="step-code">python -m venv bwa_env
-source bwa_env/bin/activate     # macOS/Linux
-bwa_env\Scripts\activate        # Windows</div>
+              <div class="step-code">conda create --name bwa_env python=3.11
+                conda activate bwa_env</div>
             </div>
           </div>
 

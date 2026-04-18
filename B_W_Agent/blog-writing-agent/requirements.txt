@@ -1,0 +1,28 @@
+# Core orchestration
+crewai==1.14.0
+langchain
+langchain-community
+
+# LLM (local)
+ollama
+
+# Search tools
+duckduckgo-search
+
+# Image generation
+diffusers
+torch
+transformers
+accelerate
+
+# RAG / Vector store – version compatible with CrewAI
+chromadb
+
+# UI
+streamlit
+
+# Utilities – versions compatible with CrewAI
+pydantic
+python-dotenv
+rich
+typing-extensions
