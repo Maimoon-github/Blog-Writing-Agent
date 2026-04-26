@@ -1,82 +1,69 @@
-.PHONY: help install dev lint test test-unit test-integration serve docker-up docker-down migrate health clean
+.PHONY: help install dev lint format typecheck test test-unit test-integration serve docker-up docker-down health clean pull-ollama
 
 help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
 # ─── Installation ───
-
 install: ## Install production dependencies
-	pip install -e .
+	poetry install --no-root
 
 dev: ## Install with development dependencies
-	pip install -e ".[dev]"
+	poetry install --with dev
 
 # ─── Code Quality ───
-
 lint: ## Run linter (ruff)
-	ruff check src/ tests/
-	ruff format --check src/ tests/
+	poetry run ruff check src/ tests/
 
 format: ## Auto-format code
-	ruff format src/ tests/
-	ruff check --fix src/ tests/
+	poetry run ruff format src/ tests/
+	poetry run ruff check --fix src/ tests/
 
 typecheck: ## Run type checker (mypy)
-	mypy src/
+	poetry run mypy src/
 
 # ─── Testing ───
-
 test: ## Run all tests
-	pytest tests/ -v
+	poetry run pytest tests/ -v
 
 test-unit: ## Run unit tests only
-	pytest tests/unit/ -v -m unit
+	poetry run pytest tests/unit/ -v -m unit
 
 test-integration: ## Run integration tests only
-	pytest tests/integration/ -v -m integration
-
-test-e2e: ## Run end-to-end tests
-	pytest tests/e2e/ -v -m e2e
-
-test-cov: ## Run tests with coverage report
-	pytest tests/ --cov=blog_agent_system --cov-report=term-missing --cov-report=html
+	poetry run pytest tests/integration/ -v -m integration
 
 # ─── Application ───
-
 serve: ## Start the FastAPI development server
-	uvicorn blog_agent_system.main:app --reload --host 0.0.0.0 --port 8080
+	poetry run uvicorn blog_agent_system.main:app --reload --host 0.0.0.0 --port 8080
 
-cli-generate: ## Generate a test blog (usage: make cli-generate TOPIC="your topic")
-	python -m blog_agent_system.cli generate "$(TOPIC)"
+cli-generate: ## Generate a test blog (make cli-generate TOPIC="your topic")
+	poetry run python -m blog_agent_system.cli generate "$(TOPIC)"
 
 # ─── Infrastructure ───
-
-docker-up: ## Start infrastructure services (Postgres, Redis, ChromaDB, MinIO)
+docker-up: ## Start infrastructure (Postgres, Redis, ChromaDB, Ollama)
 	docker compose up -d
 
-docker-down: ## Stop infrastructure services
+docker-down: ## Stop infrastructure
 	docker compose down
 
-docker-logs: ## View infrastructure logs
+docker-logs: ## View logs
 	docker compose logs -f
 
+pull-ollama: ## Pull latest Ollama models (run once)
+	docker compose exec ollama ollama pull mistral
+	docker compose exec ollama ollama pull gemma2:9b
+
 # ─── Database ───
+migrate: ## Run migrations
+	poetry run alembic upgrade head
 
-migrate: ## Run database migrations
-	alembic upgrade head
-
-migrate-create: ## Create a new migration (usage: make migrate-create MSG="description")
-	alembic revision --autogenerate -m "$(MSG)"
-
-migrate-down: ## Rollback last migration
-	alembic downgrade -1
+migrate-create: ## Create new migration
+	poetry run alembic revision --autogenerate -m "$(MSG)"
 
 # ─── Utilities ───
-
 health: ## Check infrastructure health
-	python -m blog_agent_system.cli health
+	poetry run python -m blog_agent_system.cli health
 
-clean: ## Remove build artifacts and caches
+clean: ## Clean caches and artifacts
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type d -name .pytest_cache -exec rm -rf {} + 2>/dev/null || true
 	find . -type d -name .mypy_cache -exec rm -rf {} + 2>/dev/null || true

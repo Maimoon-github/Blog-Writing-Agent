@@ -1,0 +1,47 @@
+[tool.poetry]
+name = "blog-agent-system"
+version = "0.1.0"
+description = "Agentic AI Blog Writing System — Multi-agent LangGraph pipeline"
+authors = ["Agentic Workflow Architect"]
+license = "MIT"
+readme = "README.md"
+packages = [{ include = "blog_agent_system", from = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+langgraph = "^1.1.9"
+langchain-core = "^0.3.0"
+fastapi = "^0.115.0"
+uvicorn = { extras = ["standard"], version = "^0.32.0" }
+sqlalchemy = { extras = ["asyncio"], version = "^2.0.0" }
+alembic = "^1.14.0"
+asyncpg = "^0.30.0"
+redis = { extras = ["asyncio"], version = "^5.2.0" }
+chromadb = "^0.5.0"
+httpx = "^0.28.0"
+structlog = "^25.1.0"
+typer = "^0.15.0"
+pydantic = "^2.10.0"
+python-dotenv = "^1.0.0"
+tenacity = "^9.0.0"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.9.0"
+mypy = "^1.15.0"
+pytest = "^8.3.0"
+pytest-asyncio = "^0.25.0"
+pytest-cov = "^6.0.0"
+pre-commit = "^4.0.0"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.poetry.scripts]
+blog-agent = "blog_agent_system.cli:app"
