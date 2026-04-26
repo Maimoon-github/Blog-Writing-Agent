@@ -159,8 +159,6 @@ blog_agent_system/
 │       ├── llm/                       # ─── LLM INTEGRATION LAYER ───
 │       │   ├── __init__.py
 │       │   ├── provider.py            # Abstract LLMProvider; unified interface
-│       │   ├── openai_provider.py     # GPT-4o, GPT-4o-mini implementations
-│       │   ├── anthropic_provider.py  # Claude 3.5 Sonnet/Haiku implementations
 │       │   ├── ollama_provider.py     # Local model support for cost-sensitive operations
 │       │   ├── factory.py             # Provider instantiation based on config/agent role
 │       │   ├── token_manager.py       # Token counting, budget enforcement, truncation
