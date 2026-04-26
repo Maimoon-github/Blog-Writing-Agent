@@ -1,8 +1,5 @@
 """
-Writer Agent — generates prose for each blog section.
-
-Writes section-by-section, maintaining voice consistency and incorporating
-research sources. Handles revision feedback from the quality gate.
+Writer Agent — generates prose section-by-section.
 """
 
 from typing import Any
@@ -22,95 +19,60 @@ class WriterAgent(BaseAgent):
 
     def get_system_prompt(self) -> str:
         return (
-            "You are an expert blog writer. You write engaging, well-researched "
-            "content that resonates with the target audience.\n\n"
-            "WRITING PRINCIPLES:\n"
-            "1. Write original, engaging prose — not a list of facts\n"
-            "2. Incorporate sources naturally (don't just cite, weave them in)\n"
-            "3. Use clear transitions between paragraphs\n"
-            "4. Match the specified tone consistently\n"
-            "5. Follow the style guide conventions\n"
-            "6. Hit the target word count for each section\n"
-            "7. End each section with a bridge to the next\n"
+            "You are an expert blog writer. Write engaging, original prose that incorporates "
+            "research naturally and maintains consistent tone.\n\n"
+            "INSTRUCTIONS:\n"
+            "1. Write engaging prose\n"
+            "2. Incorporate sources naturally\n"
+            "3. Use smooth transitions\n"
+            "4. Hit target word count per section\n"
+            "5. Follow style guide"
         )
 
     async def execute(self, state: BlogState) -> dict[str, Any]:
         is_revision = state.revision_count > 0
-        logger.info(
-            "writer_agent.start",
-            topic=state.topic,
-            section_count=len(state.outline),
-            is_revision=is_revision,
-            revision_count=state.revision_count,
-        )
+        logger.info("writer_agent.start", topic=state.topic, revision=is_revision)
 
-        # Build research context
-        research_context = "\n".join(
-            f"- {s.title}: {s.snippet}" for s in state.research_findings
-        )
+        research_context = "\n".join(f"- {s.title}: {s.snippet}" for s in state.research_findings)
 
         draft_sections: list[Section] = []
         previous_summary = ""
 
         for i, section in enumerate(state.outline):
-            # Build section-specific prompt
-            revision_instruction = ""
-            if is_revision and state.revision_feedback:
-                revision_instruction = (
-                    f"\n\nREVISION FEEDBACK (address these issues):\n"
-                    f"{state.revision_feedback}\n"
-                )
+            revision_instruction = (
+                f"\n\nREVISION FEEDBACK:\n{state.revision_feedback}" if is_revision and state.revision_feedback else ""
+            )
 
             messages = [
                 {"role": "system", "content": self.get_system_prompt()},
                 {
                     "role": "user",
                     "content": (
-                        f"Write section {i + 1} of {len(state.outline)} for the blog post.\n\n"
-                        f"TOPIC: {state.topic}\n"
-                        f"SECTION HEADING: {section.heading}\n"
-                        f"TARGET AUDIENCE: {state.target_audience}\n"
-                        f"TONE: {state.tone}\n"
-                        f"TARGET WORD COUNT: {section.word_count}\n"
-                        f"STYLE GUIDE: {state.style_guide}\n\n"
-                        f"KEY POINTS TO COVER:\n"
-                        + "\n".join(f"- {kp}" for kp in section.key_points)
-                        + f"\n\nRESEARCH CONTEXT:\n{research_context}\n\n"
-                        f"PREVIOUS SECTION SUMMARY:\n{previous_summary or 'This is the first section.'}\n"
-                        f"{revision_instruction}\n"
-                        f"OUTPUT ONLY THE SECTION CONTENT. No meta-commentary."
+                        f"Write section {i+1}/{len(state.outline)}:\n\n"
+                        f"HEADING: {section.heading}\n"
+                        f"WORD COUNT: {section.word_count}\n"
+                        f"RESEARCH:\n{research_context}\n"
+                        f"PREVIOUS: {previous_summary}\n"
+                        f"{revision_instruction}\n\n"
+                        "OUTPUT ONLY THE SECTION CONTENT."
                     ),
                 },
             ]
 
-            content = await self._generate(messages)
+            content = await self.llm.generate(messages)
 
-            written_section = Section(
+            written = Section(
                 heading=section.heading,
                 content=content,
-                key_points=section.key_points,
                 word_count=len(content.split()),
                 sources=[s.url for s in state.research_findings[:3]],
             )
-            draft_sections.append(written_section)
-
-            # Summary for next section's context
+            draft_sections.append(written)
             previous_summary = content[:200] + "..." if len(content) > 200 else content
 
-            logger.debug(
-                "writer_agent.section_complete",
-                section=i + 1,
-                heading=section.heading,
-                words=written_section.word_count,
-            )
+        full_draft = "\n\n".join(f"## {s.heading}\n\n{s.content}" for s in draft_sections)
 
-        # Assemble full draft
-        full_draft = "\n\n".join(
-            f"## {s.heading}\n\n{s.content}" for s in draft_sections
-        )
-
-        total_words = sum(s.word_count for s in draft_sections)
-        logger.info("writer_agent.complete", total_words=total_words, section_count=len(draft_sections))
+        logger.info("writer_agent.complete", total_words=sum(s.word_count for s in draft_sections))
 
         return {
             "draft_sections": draft_sections,
@@ -121,6 +83,6 @@ class WriterAgent(BaseAgent):
 
 
 async def writer_node(state: BlogState) -> dict[str, Any]:
-    """LangGraph node wrapper for WriterAgent."""
+    """LangGraph node wrapper."""
     agent = WriterAgent()
     return await agent.execute(state)

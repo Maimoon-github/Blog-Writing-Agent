@@ -1,5 +1,5 @@
 """
-Editor Agent — refines the draft for clarity, grammar, and style adherence.
+Editor Agent — refines the draft for clarity, grammar, and style.
 """
 
 from typing import Any
@@ -19,45 +19,36 @@ class EditorAgent(BaseAgent):
 
     def get_system_prompt(self) -> str:
         return (
-            "You are a meticulous professional editor. Your job is to refine "
-            "a blog post draft for publication quality.\n\n"
-            "EDITING CHECKLIST:\n"
-            "1. Fix grammar, spelling, and punctuation errors\n"
-            "2. Improve sentence clarity and conciseness\n"
-            "3. Ensure consistent tone throughout\n"
-            "4. Strengthen transitions between paragraphs and sections\n"
-            "5. Remove redundancy and filler words\n"
-            "6. Verify logical flow of arguments\n"
-            "7. Adhere to the specified style guide\n"
-            "8. Ensure headings are parallel in structure\n\n"
-            "OUTPUT the complete edited blog post. Do not add commentary."
+            "You are a meticulous professional editor. Refine the draft for publication quality.\n\n"
+            "CHECKLIST:\n"
+            "1. Fix grammar and punctuation\n"
+            "2. Improve clarity and conciseness\n"
+            "3. Ensure consistent tone\n"
+            "4. Strengthen transitions\n"
+            "5. Remove redundancy\n"
+            "6. Follow style guide"
         )
 
     async def execute(self, state: BlogState) -> dict[str, Any]:
-        logger.info("editor_agent.start", draft_length=len(state.draft.split()))
+        logger.info("editor_agent.start")
 
         messages = [
             {"role": "system", "content": self.get_system_prompt()},
             {
                 "role": "user",
                 "content": (
-                    f"Edit the following blog post draft:\n\n"
-                    f"STYLE GUIDE: {state.style_guide}\n"
-                    f"TONE: {state.tone}\n"
-                    f"TARGET AUDIENCE: {state.target_audience}\n\n"
-                    f"---DRAFT---\n{state.draft}\n---END DRAFT---\n\n"
-                    f"Return the complete edited blog post."
+                    f"Edit this draft:\n\n"
+                    f"STYLE: {state.style_guide}\n"
+                    f"TONE: {state.tone}\n\n"
+                    f"---DRAFT---\n{state.draft}\n---END---\n\n"
+                    "Return the complete edited blog post."
                 ),
             },
         ]
 
-        edited = await self._generate(messages)
+        edited = await self.llm.generate(messages)
 
-        logger.info(
-            "editor_agent.complete",
-            original_words=len(state.draft.split()),
-            edited_words=len(edited.split()),
-        )
+        logger.info("editor_agent.complete")
 
         return {
             "draft": edited,
@@ -68,6 +59,6 @@ class EditorAgent(BaseAgent):
 
 
 async def editor_node(state: BlogState) -> dict[str, Any]:
-    """LangGraph node wrapper for EditorAgent."""
+    """LangGraph node wrapper."""
     agent = EditorAgent()
     return await agent.execute(state)
