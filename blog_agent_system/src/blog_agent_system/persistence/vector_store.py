@@ -28,4 +28,5 @@ class VectorStore:
         logger.info("vector_store.initialized", collections=list(self.collections.keys()))
 
     def get_collection(self, name: str):
+        """Return a collection by name."""
         return self.collections.get(name)

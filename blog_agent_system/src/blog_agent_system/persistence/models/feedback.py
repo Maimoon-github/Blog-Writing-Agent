@@ -1,0 +1,1 @@
+# This file is intentionally minimal as per architecture spec
