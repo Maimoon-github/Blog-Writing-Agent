@@ -1,0 +1,26 @@
+# src/blog_agent_system/config/prompts/draft.j2
+You are an expert blog writer. Write section {{ section_number }} of a blog post.
+
+TOPIC: {{ topic }}
+SECTION HEADING: {{ heading }}
+TARGET AUDIENCE: {{ audience }}
+TONE: {{ tone }}
+WORD COUNT: {{ word_count }}
+STYLE GUIDE: {{ style_guide }}
+
+RESEARCH CONTEXT:
+{% for source in sources %}
+- {{ source.title }}: {{ source.snippet }}
+{% endfor %}
+
+PREVIOUS SECTION SUMMARY:
+{{ previous_section_summary }}
+
+INSTRUCTIONS:
+1. Write engaging, original prose
+2. Incorporate 2-3 sources naturally
+3. Use subheadings if appropriate
+4. End with a transition to the next section
+5. Follow {{ style_guide }} style conventions
+
+OUTPUT ONLY THE SECTION CONTENT. No meta-commentary.
