@@ -1,21 +1,31 @@
-# src/blog_agent_system/persistence/vector_store.py
+"""
+ChromaDB vector store client wrapper.
+"""
+
 import chromadb
-from chromadb.config import Settings
+
+from blog_agent_system.config.settings import settings
+from blog_agent_system.utils.logging import get_logger
+
+logger = get_logger(__name__)
+
 
 class VectorStore:
+    """ChromaDB client wrapper with pre-configured collections."""
+
     def __init__(self):
-        self.client = chromadb.Client(Settings(
-            chroma_server_host="chromadb",
-            chroma_server_http_port=8000,
-            anonymized_telemetry=False
-        ))
-        
-        # Collections for different knowledge domains
+        self.client = chromadb.HttpClient(
+            host=settings.chroma_host,
+            port=settings.chroma_port,
+        )
+
         self.collections = {
             "blog_knowledge": self.client.get_or_create_collection("blog_knowledge"),
             "style_guides": self.client.get_or_create_collection("style_guides"),
-            "previous_blogs": self.client.get_or_create_collection("previous_blogs")
+            "previous_blogs": self.client.get_or_create_collection("previous_blogs"),
         }
-    
+
+        logger.info("vector_store.initialized", collections=list(self.collections.keys()))
+
     def get_collection(self, name: str):
         return self.collections.get(name)
