@@ -17,6 +17,7 @@ class StateAccessor:
         self.checkpointer = checkpointer
 
     async def read(self, thread_id: str) -> BlogState | None:
+        """Read current state from checkpoint."""
         config = {"configurable": {"thread_id": thread_id}}
         checkpoint = await self.checkpointer.aget(config)
         if checkpoint and "channel_values" in checkpoint:
@@ -24,7 +25,7 @@ class StateAccessor:
         return None
 
     async def write(self, thread_id: str, updates: dict) -> None:
-        """External state injection (LangGraph handles this via node returns)."""
+        """External state injection (LangGraph handles most via node returns)."""
         config = {"configurable": {"thread_id": thread_id}}
         await self.checkpointer.aput(config, updates)
         logger.debug("shared_state.write", thread_id=thread_id, keys=list(updates.keys()))

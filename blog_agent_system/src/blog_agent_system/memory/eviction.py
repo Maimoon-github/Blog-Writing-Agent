@@ -9,10 +9,10 @@ logger = get_logger(__name__)
 
 class EvictionManager:
     """
-    Manages memory eviction across tiers:
-    - Short-term: Automatic via Redis TTL (no code needed)
-    - Episodic: Batch archive job for old threads
-    - Long-term: Manual review (no automatic eviction to prevent knowledge loss)
+    Manages memory eviction across tiers per ADR-002:
+    - Short-term: Automatic via Redis TTL
+    - Episodic: Batch archive job
+    - Long-term: Manual review (no auto-eviction)
     """
 
     def __init__(self, episodic_memory=None):

@@ -27,6 +27,7 @@ class LongTermMemory:
         logger.info("long_term_memory.initialized", collection=collection_name)
 
     async def store(self, documents: list[str], metadata: list[dict], ids: list[str]) -> None:
+        """Store documents with embeddings."""
         embeddings = await self.embeddings.aembed_documents(documents)
         self.collection.add(
             embeddings=embeddings,
@@ -37,6 +38,7 @@ class LongTermMemory:
         logger.info("long_term_memory.stored", count=len(documents))
 
     async def retrieve(self, query: str, top_k: int = 5, where: dict | None = None) -> list[dict]:
+        """Retrieve semantically similar documents."""
         query_embedding = await self.embeddings.aembed_query(query)
         kwargs: dict = {
             "query_embeddings": [query_embedding],
