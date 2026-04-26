@@ -1,0 +1,130 @@
+blog_agent_system/
+├── README.md                          # Project overview, setup instructions, architecture diagram
+├── pyproject.toml                     # Poetry dependencies, project metadata, tool configs
+├── .env.example                       # Template for all environment variables
+├── docker-compose.yml                 # Local infrastructure: PostgreSQL, Redis, ChromaDB, MinIO
+├── Makefile                           # Common commands: test, lint, migrate, run
+│
+├── src/
+│   └── blog_agent_system/
+│       ├── __init__.py
+│       │
+│       ├── main.py                    # Application entry point; FastAPI app factory
+│       ├── cli.py                     # Typer CLI for local development and debugging
+│       │
+│       ├── config/                    # ─── CONFIGURATION LAYER ───
+│       │   ├── __init__.py
+│       │   ├── settings.py            # Pydantic-Settings; env var validation & defaults
+│       │   ├── llm_config.py          # Per-agent model selection, temperature, token budgets
+│       │   ├── prompts/               # Jinja2 prompt templates (version-controlled text)
+│       │   │   ├── research.j2
+│       │   │   ├── outline.j2
+│       │   │   ├── draft.j2
+│       │   │   ├── edit.j2
+│       │   │   ├── seo.j2
+│       │   │   └── critique.j2
+│       │   └── agents.yaml            # Agent role definitions, system prompts, tool assignments
+│       │
+│       ├── core/                      # ─── CORE ORCHESTRATION ───
+│       │   ├── __init__.py
+│       │   ├── state.py               # Pydantic state schema; typed graph state definition
+│       │   ├── graph.py               # LangGraph construction; nodes, edges, conditional routing
+│       │   ├── orchestrator.py        # Supervisor logic; delegates to agents, manages lifecycle
+│       │   └── checkpoint.py          # LangGraph persistence adapter (PostgresSaver setup)
+│       │
+│       ├── agents/                    # ─── AGENT LAYER ───
+│       │   ├── __init__.py
+│       │   ├── base.py                # BaseAgent abstract class; shared init, LLM binding, execute()
+│       │   ├── research_agent.py      # Gathers sources, summarizes findings, extracts quotes
+│       │   ├── outline_agent.py       # Structures blog sections, headings, key points per section
+│       │   ├── writer_agent.py        # Generates prose per section; maintains voice consistency
+│       │   ├── editor_agent.py        # Grammar, style, clarity improvements; line-edits
+│       │   ├── seo_agent.py           # Keyword optimization, meta descriptions, readability
+│       │   ├── fact_checker_agent.py  # Verifies claims against sources; confidence scoring
+│       │   └── image_agent.py         # Generates/retrieves cover images and section visuals
+│       │
+│       ├── tools/                     # ─── TOOL & FUNCTION LAYER ───
+│       │   ├── __init__.py
+│       │   ├── registry.py            # Tool registration decorator; discovery and metadata
+│       │   ├── base.py                # BaseTool class; input schema, execution, error handling
+│       │   ├── web_search.py          # Tavily/Brave Search integration; result ranking
+│       │   ├── rag_retriever.py       # ChromaDB vector search; context assembly
+│       │   ├── code_executor.py       # E2B/sandboxed Python execution for data viz generation
+│       │   ├── file_io.py             # Read/write local artifacts; markdown, images, JSON
+│       │   └── image_generator.py     # Stable Diffusion/Flux API for blog illustrations
+│       │
+│       ├── llm/                       # ─── LLM INTEGRATION LAYER ───
+│       │   ├── __init__.py
+│       │   ├── provider.py            # Abstract LLMProvider; unified interface
+│       │   ├── ollama_provider.py     # Local model support for cost-sensitive operations
+│       │   ├── factory.py             # Provider instantiation based on config/agent role
+│       │   ├── token_manager.py       # Token counting, budget enforcement, truncation
+│       │   └── structured_output.py   # JSON schema enforcement; Pydantic model parsing
+│       │
+│       ├── memory/                    # ─── MEMORY & STATE MANAGEMENT ───
+│       │   ├── __init__.py
+│       │   ├── short_term.py          # Redis-backed conversation buffer; sliding window
+│       │   ├── long_term.py           # ChromaDB vector store; embedding-based retrieval
+│       │   ├── episodic.py            # PostgreSQL conversation history; thread persistence
+│       │   ├── shared_state.py        # LangGraph state accessors; thread-scoped read/write
+│       │   └── eviction.py            # LRU eviction, TTL policies, memory compaction
+│       │
+│       ├── persistence/               # ─── DATA PERSISTENCE LAYER ───
+│       │   ├── __init__.py
+│       │   ├── database.py            # SQLAlchemy engine, session factory, connection pooling
+│       │   ├── models/                # ORM models (Alembic-managed)
+│       │   │   ├── __init__.py
+│       │   │   ├── task.py            # Blog generation tasks: status, config, timestamps
+│       │   │   ├── agent_run.py       # Per-agent execution logs: input, output, latency
+│       │   │   ├── document.py        # Generated blog posts: markdown, metadata, versions
+│       │   │   └── feedback.py        # Human-in-the-loop feedback for RLHF
+│       │   ├── repositories/          # Repository pattern; data access abstraction
+│       │   │   ├── __init__.py
+│       │   │   ├── task_repo.py
+│       │   │   └── document_repo.py
+│       │   └── vector_store.py        # ChromaDB client wrapper; collection management
+│       │
+│       ├── models/                    # ─── PYDANTIC SCHEMAS ───
+│       │   ├── __init__.py
+│       │   ├── blog.py                # BlogPost, Section, Metadata schemas
+│       │   ├── research.py            # Source, Claim, Evidence schemas
+│       │   └── workflow.py            # TaskRequest, TaskStatus, QualityScore schemas
+│       │
+│       ├── api/                       # ─── API LAYER ───
+│       │   ├── __init__.py
+│       │   ├── router.py              # FastAPI route definitions
+│       │   ├── dependencies.py        # DI container: DB sessions, Redis, vector store
+│       │   └── schemas.py             # Request/response DTOs
+│       │
+│       └── utils/                     # ─── UTILITIES ───
+│           ├── __init__.py
+│           ├── logging.py             # Structured JSON logging with correlation IDs
+│           ├── exceptions.py          # Custom exception hierarchy
+│           └── validators.py          # Input sanitization, URL validation
+│
+├── tests/
+│   ├── __init__.py
+│   ├── conftest.py                    # Pytest fixtures: test DB, mock LLM, fake state
+│   ├── unit/                          # Isolated agent/tool tests
+│   │   ├── test_agents.py
+│   │   ├── test_tools.py
+│   │   └── test_llm_providers.py
+│   ├── integration/                   # Multi-agent workflow tests
+│   │   ├── test_graph_execution.py
+│   │   └── test_memory_persistence.py
+│   └── e2e/                           # Full blog generation scenarios
+│       └── test_blog_workflow.py
+│
+├── alembic/                           # Database migration scripts
+│   ├── env.py
+│   ├── script.py.mako
+│   └── versions/
+│
+├── docs/                              # Architecture Decision Records (ADRs)
+│   ├── adr-001-orchestrator-choice.md
+│   ├── adr-002-memory-strategy.md
+│   └── adr-003-llm-abstraction.md
+│
+└── scripts/
+    ├── seed_db.py                     # Initial data seeding
+    └── health_check.py                # Dependency health verification
