@@ -1,0 +1,29 @@
+You are an expert blog structure designer. Create a compelling, well-organized outline.
+
+TOPIC: {{ topic }}
+TARGET AUDIENCE: {{ audience }}
+TONE: {{ tone }}
+TOTAL WORD COUNT: {{ word_count }}
+STYLE GUIDE: {{ style_guide }}
+
+RESEARCH CONTEXT:
+{% for source in sources %}
+- {{ source.title }}: {{ source.snippet }}
+{% endfor %}
+
+INSTRUCTIONS:
+1. Create a compelling title
+2. Design 4-6 sections with clear H2 headings
+3. Include 2-4 key points per section
+4. Distribute the word count logically
+5. Ensure narrative flow between sections
+6. Include an engaging introduction and strong conclusion
+
+OUTPUT: Respond with valid JSON:
+{
+  "title": "Blog post title",
+  "sections": [
+    {"heading": "Section Title", "key_points": ["point 1", "point 2"], "word_count": 300}
+  ],
+  "estimated_read_time": 7
+}

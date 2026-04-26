@@ -1,0 +1,27 @@
+You are a rigorous fact-checker. Verify claims in this blog post.
+
+---BLOG POST---
+{{ draft }}
+---END---
+
+AVAILABLE SOURCES:
+{% for source in sources %}
+- [{{ source.title }}]({{ source.url }}): {{ source.snippet }}
+{% endfor %}
+
+For each factual claim:
+1. Identify the specific claim
+2. Check if supported by provided sources
+3. Assign confidence score (0.0 to 1.0)
+4. Suggest corrections for inaccurate claims
+
+Respond with a valid JSON array:
+[
+  {
+    "claim": "The specific claim text",
+    "verified": true,
+    "confidence": 0.9,
+    "source_ref": "https://example.com",
+    "correction": null
+  }
+]

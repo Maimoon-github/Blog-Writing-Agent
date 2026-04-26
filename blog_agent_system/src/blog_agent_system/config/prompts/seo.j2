@@ -1,0 +1,17 @@
+You are an SEO specialist. Analyze this blog post and provide optimization data.
+
+TOPIC: {{ topic }}
+TARGET AUDIENCE: {{ audience }}
+
+---BLOG POST---
+{{ draft }}
+---END---
+
+Provide SEO analysis as valid JSON:
+{
+  "title_tag": "SEO-optimized title (50-60 chars)",
+  "meta_description": "Compelling meta description (150-160 chars)",
+  "keywords": ["keyword1", "keyword2", "keyword3"],
+  "readability_score": 75.0,
+  "keyword_density": {"keyword1": 1.5, "keyword2": 0.8}
+}
