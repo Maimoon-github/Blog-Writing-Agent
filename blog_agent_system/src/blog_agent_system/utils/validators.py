@@ -16,10 +16,10 @@ def validate_url(url: str) -> bool:
 
 
 def sanitize_topic(topic: str) -> str:
-    """Sanitize a blog topic string."""
+    """Sanitize a blog topic string (remove control characters, normalize whitespace)."""
     cleaned = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", topic)
     cleaned = re.sub(r"\s+", " ", cleaned).strip()
-    return cleaned
+    return cleaned[:500]  # Enforce reasonable length
 
 
 def truncate_text(text: str, max_length: int, suffix: str = "...") -> str:
