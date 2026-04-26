@@ -1,4 +1,4 @@
-You are a rigorous fact-checker. Verify claims in this blog post.
+You are a rigorous fact-checker and quality critic. Verify claims and suggest improvements.
 
 ---BLOG POST---
 {{ draft }}
@@ -10,18 +10,9 @@ AVAILABLE SOURCES:
 {% endfor %}
 
 For each factual claim:
-1. Identify the specific claim
-2. Check if supported by provided sources
-3. Assign confidence score (0.0 to 1.0)
-4. Suggest corrections for inaccurate claims
+- Identify the claim
+- Check support by sources
+- Assign confidence score (0.0-1.0)
+- Suggest corrections
 
-Respond with a valid JSON array:
-[
-  {
-    "claim": "The specific claim text",
-    "verified": true,
-    "confidence": 0.9,
-    "source_ref": "https://example.com",
-    "correction": null
-  }
-]
+Respond ONLY with a valid JSON array of objects.

@@ -1,14 +1,8 @@
-"""
-Application settings loaded from environment variables.
-"""
-
+"""Application settings loaded from environment variables."""
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
 class Settings(BaseSettings):
-    """Application configuration with environment variable validation."""
-
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
@@ -16,45 +10,41 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # ─── Environment ───
+    # Environment
     app_env: str = Field(default="development")
     app_debug: bool = Field(default=False)
 
-    # ─── LLM Provider API Keys ───
+    # LLM Provider API Keys
     openai_api_key: str = Field(default="")
     anthropic_api_key: str = Field(default="")
 
-    # ─── Web Search ───
+    # Web Search
     tavily_api_key: str = Field(default="")
 
-    # ─── Database ───
-    database_url: str = Field(
-        default="postgresql+asyncpg://blog_agent:blog_agent_pass@localhost:5432/blog_agent_db",
-    )
-    database_url_sync: str = Field(
-        default="postgresql+psycopg://blog_agent:blog_agent_pass@localhost:5432/blog_agent_db",
-    )
+    # Database
+    database_url: str = Field(default="postgresql+asyncpg://blog_agent:blog_agent_pass@localhost:5432/blog_agent_db")
+    database_url_sync: str = Field(default="postgresql+psycopg://blog_agent:blog_agent_pass@localhost:5432/blog_agent_db")
 
-    # ─── Redis ───
+    # Redis
     redis_url: str = Field(default="redis://localhost:6379/0")
 
-    # ─── ChromaDB ───
+    # ChromaDB
     chroma_host: str = Field(default="localhost")
     chroma_port: int = Field(default=8000)
 
-    # ─── Ollama ───
+    # Ollama
     ollama_base_url: str = Field(default="http://localhost:11434")
 
-    # ─── Logging ───
+    # Logging
     log_level: str = Field(default="INFO")
     log_format: str = Field(default="console")
 
-    # ─── Quality Gate ───
+    # Quality Gate
     quality_threshold: float = Field(default=0.85, ge=0.0, le=1.0)
     max_revisions: int = Field(default=3, ge=1, le=10)
     workflow_timeout_seconds: int = Field(default=600, ge=60, le=3600)
 
-    # ─── Blog Defaults ───
+    # Blog Defaults
     default_word_count: int = Field(default=1500, ge=500, le=5000)
     default_tone: str = Field(default="informative yet conversational")
     default_audience: str = Field(default="technical professionals")
@@ -69,6 +59,5 @@ class Settings(BaseSettings):
             raise ValueError(f"log_level must be one of {valid}, got '{v}'")
         return upper
 
-
-# Singleton instance
+# Singleton
 settings = Settings()
