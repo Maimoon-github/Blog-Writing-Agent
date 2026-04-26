@@ -23,7 +23,7 @@ Here is the **step-by-step roadmap** to build the complete project from the prov
 
 ### Phase 4: LLM Layer
 14. `llm/provider.py`
-15. `llm/openai_provider.py` / `anthropic_provider.py` / `ollama_provider.py`
+15. `llm/ollama_provider.py`
 16. `llm/factory.py`
 17. `llm/token_manager.py`
 18. `llm/structured_output.py`
