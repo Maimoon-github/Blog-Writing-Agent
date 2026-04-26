@@ -1,23 +1,28 @@
-"""
-Blog Orchestrator — manages the lifecycle of blog generation tasks.
-"""
+"""Blog Orchestrator — central supervisor."""
 
 import uuid
 from typing import Any, Optional
 
 from blog_agent_system.core.graph import create_blog_graph
+from blog_agent_system.core.checkpoint import create_checkpointer
 from blog_agent_system.utils.logging import get_logger, new_correlation_id
 
 logger = get_logger(__name__)
 
 
 class BlogOrchestrator:
-    """Supervisor that coordinates the blog generation pipeline."""
+    """Main supervisor for the blog generation pipeline."""
 
-    def __init__(self, checkpointer=None):
-        self.graph = create_blog_graph(checkpointer=checkpointer)
-        self.checkpointer = checkpointer
-        logger.info("orchestrator.initialized", has_checkpointer=checkpointer is not None)
+    def __init__(self):
+        self.checkpointer = None
+        self.graph = None
+
+    async def initialize(self):
+        """Lazy initialization with checkpointer."""
+        if self.checkpointer is None:
+            self.checkpointer = await create_checkpointer()
+            self.graph = create_blog_graph(checkpointer=self.checkpointer)
+        return self
 
     async def generate_blog(
         self,
@@ -29,7 +34,9 @@ class BlogOrchestrator:
         style_guide: str = "AP",
         thread_id: Optional[str] = None,
     ) -> dict[str, Any]:
-        """Execute the full blog generation pipeline."""
+        """Execute the full multi-agent pipeline."""
+        await self.initialize()
+
         thread_id = thread_id or f"blog-{uuid.uuid4().hex[:12]}"
         correlation_id = new_correlation_id()
 
@@ -51,8 +58,12 @@ class BlogOrchestrator:
         try:
             final_state = await self.graph.ainvoke(initial_state, config=config)
 
-            logger.info("orchestrator.complete", thread_id=thread_id,
-                        quality_score=final_state.get("quality_score", 0.0))
+            logger.info(
+                "orchestrator.complete",
+                thread_id=thread_id,
+                quality_score=final_state.get("quality_score", 0.0),
+                revisions=final_state.get("revision_count", 0),
+            )
 
             return {
                 "thread_id": thread_id,
@@ -76,9 +87,9 @@ class BlogOrchestrator:
             }
 
     async def get_status(self, thread_id: str) -> dict[str, Any]:
-        """Get the current status of a blog generation workflow."""
+        """Get current workflow status."""
         if not self.checkpointer:
-            return {"thread_id": thread_id, "status": "unknown", "error": "No checkpointer"}
+            return {"thread_id": thread_id, "status": "unknown"}
 
         config = {"configurable": {"thread_id": thread_id}}
         state = await self.graph.aget_state(config)

@@ -1,71 +1,70 @@
-# src/blog_agent_system/core/graph.py (simplified)
+from typing import Literal
 from langgraph.graph import StateGraph, END
-from blog_agent_system.agents import (
-    ResearchAgent, OutlineAgent, WriterAgent, 
-    EditorAgent, SEOAgent, FactCheckerAgent
-)
+from langgraph.checkpoint.base import BaseCheckpointSaver
 
-def create_blog_graph():
+from blog_agent_system.core.state import BlogState
+from blog_agent_system.agents.research_agent import research_node
+from blog_agent_system.agents.outline_agent import outline_node
+from blog_agent_system.agents.writer_agent import writer_node
+from blog_agent_system.agents.editor_agent import editor_node
+from blog_agent_system.agents.seo_agent import seo_node
+from blog_agent_system.agents.fact_checker_agent import fact_checker_node
+from blog_agent_system.agents.image_agent import image_node
+
+
+def quality_gate_node(state: BlogState) -> dict:
+    """Quality gate with revision decision."""
+    if state.quality_score >= 0.85 or state.revision_count >= state.max_revisions:
+        return {"status": "complete", "current_step": "quality_gate"}
+    return {
+        "status": "revising",
+        "current_step": "quality_gate",
+        "revision_count": state.revision_count + 1,
+        "revision_feedback": "Improve clarity, transitions, and factual accuracy based on previous feedback.",
+    }
+
+
+def create_blog_graph(checkpointer: BaseCheckpointSaver | None = None):
+    """Create the complete LangGraph supervisor workflow."""
     builder = StateGraph(BlogState)
-    
-    # Register nodes
-    builder.add_node("research", ResearchAgent().execute)
-    builder.add_node("outline", OutlineAgent().execute)
-    builder.add_node("write", WriterAgent().execute)
-    builder.add_node("edit", EditorAgent().execute)
-    builder.add_node("seo", SEOAgent().execute)
-    builder.add_node("fact_check", FactCheckerAgent().execute)
+
+    # Nodes
+    builder.add_node("research", research_node)
+    builder.add_node("outline", outline_node)
+    builder.add_node("write", writer_node)
+    builder.add_node("edit", editor_node)
+    builder.add_node("seo", seo_node)
+    builder.add_node("fact_check", fact_checker_node)
+    builder.add_node("image_gen", image_node)
     builder.add_node("quality_gate", quality_gate_node)
-    
-    # Sequential edges
+
+    # Sequential pipeline
     builder.set_entry_point("research")
     builder.add_edge("research", "outline")
     builder.add_edge("outline", "write")
     builder.add_edge("write", "edit")
-    
-    # Parallel fork after edit
+
+    # Parallel fork
     builder.add_edge("edit", "seo")
     builder.add_edge("edit", "fact_check")
-    
+
     # Join parallel branches
     builder.add_edge("seo", "quality_gate")
     builder.add_edge("fact_check", "quality_gate")
-    
-    # Conditional loopback
+
+    # Conditional revision loop
     builder.add_conditional_edges(
         "quality_gate",
-        lambda state: "accept" if state.quality_score >= 0.85 or state.revision_count >= 3 else "revise",
+        lambda s: "accept" if s.quality_score >= 0.85 or s.revision_count >= s.max_revisions else "revise",
         {"accept": END, "revise": "write"}
     )
-    
-    return builder.compile()
 
+    # Conditional image generation
+    builder.add_conditional_edges(
+        "quality_gate",
+        lambda s: "generate" if s.include_images else "skip",
+        {"generate": "image_gen", "skip": END}
+    )
+    builder.add_edge("image_gen", END)
 
-
-
-
-
-
-
-
-# src/blog_agent_system/core/graph.py
-from typing import Literal
-
-def should_generate_images(state: BlogState) -> Literal["generate", "skip"]:
-    """Conditional entry for image generation based on user preference."""
-    return "generate" if state.get("include_images", False) else "skip"
-
-def parallel_join_condition(state: BlogState) -> Literal["quality_gate", "wait"]:
-    """Ensures both SEO and FactChecker complete before quality gate."""
-    required_keys = ["seo_metadata", "fact_check_results"]
-    if all(k in state and state[k] for k in required_keys):
-        return "quality_gate"
-    return "wait"
-
-def revision_router(state: BlogState) -> Literal["accept", "revise"]:
-    """Routes to END or back to writer based on quality score."""
-    if state.quality_score >= 0.85:
-        return "accept"
-    if state.revision_count >= state.max_revisions:
-        return "accept"  # Force accept after max iterations
-    return "revise"
+    return builder.compile(checkpointer=checkpointer)

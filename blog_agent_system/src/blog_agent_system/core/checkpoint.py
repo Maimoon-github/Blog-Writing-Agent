@@ -1,6 +1,4 @@
-"""
-LangGraph persistence adapter for crash recovery.
-"""
+"""LangGraph persistence adapter using PostgreSQL."""
 
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 
@@ -11,7 +9,7 @@ logger = get_logger(__name__)
 
 
 async def create_checkpointer() -> AsyncPostgresSaver:
-    """Create and initialize a PostgreSQL-backed checkpointer."""
+    """Create and initialize PostgreSQL checkpointer."""
     checkpointer = AsyncPostgresSaver.from_conn_string(settings.database_url_sync)
     await checkpointer.setup()
     logger.info("checkpointer.initialized", backend="postgres")
