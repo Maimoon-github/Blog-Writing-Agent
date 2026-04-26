@@ -1,17 +1,24 @@
-# src/blog_agent_system/llm/provider.py
 from abc import ABC, abstractmethod
 from typing import AsyncIterator, Any
 from pydantic import BaseModel
 
+
 class LLMProvider(ABC):
+    """Abstract base for all LLM providers (Ollama-only in this project)."""
+
     @abstractmethod
-    async def generate(self, messages: list, tools: list = None, response_format: type[BaseModel] = None) -> str:
-        pass
-    
+    async def generate(
+        self,
+        messages: list[dict[str, str]],
+        tools: list[dict] | None = None,
+        response_format: type[BaseModel] | None = None,
+    ) -> str:
+        """Generate a complete response."""
+
     @abstractmethod
-    async def stream(self, messages: list) -> AsyncIterator[str]:
-        pass
-    
+    async def stream(self, messages: list[dict[str, str]]) -> AsyncIterator[str]:
+        """Stream response tokens."""
+
     @abstractmethod
     def count_tokens(self, text: str) -> int:
-        pass
+        """Count tokens for budget management."""
