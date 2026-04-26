@@ -1,4 +1,3 @@
-# src/blog_agent_system/config/prompts/draft.j2
 You are an expert blog writer. Write section {{ section_number }} of a blog post.
 
 TOPIC: {{ topic }}
@@ -15,6 +14,11 @@ RESEARCH CONTEXT:
 
 PREVIOUS SECTION SUMMARY:
 {{ previous_section_summary }}
+
+{% if revision_feedback %}
+REVISION FEEDBACK (address these issues):
+{{ revision_feedback }}
+{% endif %}
 
 INSTRUCTIONS:
 1. Write engaging, original prose

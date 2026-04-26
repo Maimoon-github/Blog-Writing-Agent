@@ -1,0 +1,76 @@
+# ─── Agent Role Definitions ───
+# Defines system prompts, tool assignments, and behavioral constraints per agent.
+
+agents:
+  research:
+    display_name: "Research Agent"
+    description: "Gathers sources, summarizes findings, extracts key facts"
+    tools:
+      - web_search
+      - rag_retrieve
+    constraints:
+      - "Only use credible sources (academic, industry publications, official docs)"
+      - "Always provide source URLs for claims"
+      - "Flag conflicting information explicitly"
+
+  outline:
+    display_name: "Outline Agent"
+    description: "Transforms research into a structured blog outline"
+    tools:
+      - file_io
+    constraints:
+      - "Ensure logical narrative flow between sections"
+      - "Distribute word count proportionally"
+      - "Include introduction and conclusion sections"
+
+  writer:
+    display_name: "Writer Agent"
+    description: "Generates prose section-by-section"
+    tools:
+      - rag_retrieve
+      - file_io
+    constraints:
+      - "Maintain consistent voice across sections"
+      - "Incorporate sources naturally, not as citations"
+      - "Write transitions between sections"
+
+  editor:
+    display_name: "Editor Agent"
+    description: "Refines draft for clarity, grammar, and style"
+    tools:
+      - file_io
+    constraints:
+      - "Follow the specified style guide strictly"
+      - "Preserve the author's voice while improving clarity"
+      - "Flag but do not remove intentional stylistic choices"
+
+  seo:
+    display_name: "SEO Agent"
+    description: "Optimizes for search engine visibility"
+    tools:
+      - web_search
+    constraints:
+      - "Title tag must be 50-60 characters"
+      - "Meta description must be 150-160 characters"
+      - "Keyword density should be 1-2% for primary keyword"
+
+  fact_checker:
+    display_name: "Fact Checker Agent"
+    description: "Verifies claims against research sources"
+    tools:
+      - web_search
+      - rag_retrieve
+    constraints:
+      - "Every factual claim must have a source reference"
+      - "Flag claims with confidence below 0.6"
+      - "Suggest corrections for inaccurate statements"
+
+  image:
+    display_name: "Image Agent"
+    description: "Generates cover images and section illustrations"
+    tools:
+      - image_generate
+    constraints:
+      - "Images must be relevant to section content"
+      - "Avoid text in generated images"
+      - "Use consistent visual style across illustrations"
