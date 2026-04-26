@@ -1,18 +1,30 @@
-# src/blog_agent_system/memory/shared_state.py
-from langgraph.checkpoint.postgres import PostgresSaver
+"""
+Shared state accessor — reads/writes LangGraph checkpoint state.
+"""
+
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+
 from blog_agent_system.core.state import BlogState
+from blog_agent_system.utils.logging import get_logger
+
+logger = get_logger(__name__)
+
 
 class StateAccessor:
-    def __init__(self, checkpointer: PostgresSaver):
+    """Thread-scoped read/write access to LangGraph checkpoint state."""
+
+    def __init__(self, checkpointer: AsyncPostgresSaver):
         self.checkpointer = checkpointer
-    
-    async def read(self, thread_id: str) -> BlogState:
+
+    async def read(self, thread_id: str) -> BlogState | None:
         config = {"configurable": {"thread_id": thread_id}}
         checkpoint = await self.checkpointer.aget(config)
-        return BlogState(**checkpoint["channel_values"]) if checkpoint else BlogState()
-    
-    async def write(self, thread_id: str, updates: dict):
-        # LangGraph handles this automatically via node returns,
-        # but this is used for external state injection
+        if checkpoint and "channel_values" in checkpoint:
+            return BlogState(**checkpoint["channel_values"])
+        return None
+
+    async def write(self, thread_id: str, updates: dict) -> None:
+        """External state injection (LangGraph handles this via node returns)."""
         config = {"configurable": {"thread_id": thread_id}}
         await self.checkpointer.aput(config, updates)
+        logger.debug("shared_state.write", thread_id=thread_id, keys=list(updates.keys()))
